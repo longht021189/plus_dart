@@ -10,23 +10,21 @@ import 'package:example/state/AppStateGeneric.dart';
 import 'package:example/reducer/TestLocal.provider.dart';
 import 'dart:async';
 import 'package:example/reducer/AppReducer.provider.dart';
-import 'package:example/reducer/AppReducerWithGeneric.provider.dart';
 import 'package:example/state/AppState.dart';
+import 'package:example/reducer/AppReducerWithGeneric.provider.dart';
 
 class Store {
   TestLocalProvider _varTestLocalProvider;
-  final _varAppReducerProvider = AppReducerProvider();
   final _varAppReducerWithGenericProvider = AppReducerWithGenericProvider();
   AppReducerLazyProvider _varAppReducerLazyProvider;
+  final _varAppReducerProvider = AppReducerProvider();
 
-  Stream<TestState> get streamTestState {
+  Stream<TestState<String>> get streamTestState {
     if (_varTestLocalProvider == null || _varTestLocalProvider.isClosed) {
       _varTestLocalProvider = TestLocalProvider();
     }
     return _varTestLocalProvider.stream;
   }
-
-  Stream<AppState> get streamAppState => _varAppReducerProvider.stream;
 
   Stream<AppStateGeneric<AppState>> get streamAppStateGeneric =>
       _varAppReducerWithGenericProvider.stream;
@@ -39,10 +37,10 @@ class Store {
     return _varAppReducerLazyProvider.stream;
   }
 
+  Stream<AppState> get streamAppState => _varAppReducerProvider.stream;
+
   Future sendAction(dynamic value) async {
     if (value is AppStateAction) {
-      await _varAppReducerProvider.sendAction(value);
-
       await _varAppReducerWithGenericProvider.sendAction(value);
 
       if (_varAppReducerLazyProvider == null ||
@@ -50,6 +48,8 @@ class Store {
         _varAppReducerLazyProvider = AppReducerLazyProvider();
       }
       await _varAppReducerLazyProvider.sendAction(value);
+
+      await _varAppReducerProvider.sendAction(value);
     } else if (value is TestAction) {
       if (_varTestLocalProvider != null && !_varTestLocalProvider.isClosed) {
         await _varTestLocalProvider.sendAction(value);
