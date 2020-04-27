@@ -1,6 +1,6 @@
 import 'package:example/state/AppState.dart';
 import 'package:example/state/AppStateAction.dart';
-import 'package:plus_generator/base.dart';
+import 'package:plus_dart/base.dart';
 
 class AppReducer extends Reducer<AppState, AppStateAction> {
   @override

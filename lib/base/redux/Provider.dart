@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:plus_generator/base.dart';
+import 'package:plus_dart/base.dart';
 
 abstract class Provider<State, Action, T extends Reducer<State, Action>> {
   final T _reducer;

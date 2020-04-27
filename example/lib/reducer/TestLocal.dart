@@ -1,4 +1,4 @@
-import 'package:plus_generator/base.dart';
+import 'package:plus_dart/base.dart';
 
 @local
 class TestLocal extends Reducer<TestState<String>, TestAction> {

@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:plus_generator/builders/base/BaseBuilder.dart';
-import 'package:plus_generator/builders/base/visitor/GetClasses.dart';
-import 'package:plus_generator/builders/config/FileExtensions.dart';
-import 'package:plus_generator/builders/data/redux/ProviderData.dart';
-import 'package:plus_generator/builders/data/redux/ProviderFileData.dart';
-import 'package:plus_generator/builders/redux/StoreBuilder.dart';
-import 'package:plus_generator/builders/util/CodeUtil.dart';
-import 'package:plus_generator/builders/util/TypeUtil.dart';
+import 'package:plus_dart/builders/base/BaseBuilder.dart';
+import 'package:plus_dart/builders/base/visitor/GetClasses.dart';
+import 'package:plus_dart/builders/config/FileExtensions.dart';
+import 'package:plus_dart/builders/data/redux/ProviderData.dart';
+import 'package:plus_dart/builders/data/redux/ProviderFileData.dart';
+import 'package:plus_dart/builders/redux/StoreBuilder.dart';
+import 'package:plus_dart/builders/util/CodeUtil.dart';
+import 'package:plus_dart/builders/util/TypeUtil.dart';
 
 class ProviderBuilder extends BaseBuilder {
 

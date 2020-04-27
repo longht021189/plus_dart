@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:plus_generator/builders/config/Name.dart';
-import 'package:plus_generator/builders/util/TypeUtil.dart';
+import 'package:plus_dart/builders/config/Name.dart';
+import 'package:plus_dart/builders/util/TypeUtil.dart';
 
 class ProviderData {
   final ClassElement classType;

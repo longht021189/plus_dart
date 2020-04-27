@@ -3,12 +3,12 @@ import 'dart:collection';
 
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:plus_generator/builders/config/Name.dart';
-import 'package:plus_generator/builders/config/UriList.dart';
-import 'package:plus_generator/builders/data/redux/ProviderFileData.dart';
-import 'package:plus_generator/builders/data/redux/StoreVariableData.dart';
-import 'package:plus_generator/builders/util/CodeUtil.dart';
-import 'package:plus_generator/builders/util/TypeUtil.dart';
+import 'package:plus_dart/builders/config/Name.dart';
+import 'package:plus_dart/builders/config/UriList.dart';
+import 'package:plus_dart/builders/data/redux/ProviderFileData.dart';
+import 'package:plus_dart/builders/data/redux/StoreVariableData.dart';
+import 'package:plus_dart/builders/util/CodeUtil.dart';
+import 'package:plus_dart/builders/util/TypeUtil.dart';
 
 class StoreFileData {
   bool get isValid => _isValid;

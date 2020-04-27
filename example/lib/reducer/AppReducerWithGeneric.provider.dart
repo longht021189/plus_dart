@@ -3,7 +3,7 @@
 // **************************************************************************
 
 import 'package:example/state/AppStateAction.dart';
-import 'package:plus_generator/base.dart';
+import 'package:plus_dart/base.dart';
 import 'package:example/state/AppStateGeneric.dart';
 import 'package:example/reducer/AppReducerWithGeneric.dart';
 import 'package:example/state/AppState.dart';

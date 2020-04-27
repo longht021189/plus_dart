@@ -1,9 +1,9 @@
 import 'dart:collection';
 
 import 'package:build/build.dart';
-import 'package:plus_generator/builders/config/UriList.dart';
-import 'package:plus_generator/builders/data/redux/ProviderData.dart';
-import 'package:plus_generator/builders/util/CodeUtil.dart';
+import 'package:plus_dart/builders/config/UriList.dart';
+import 'package:plus_dart/builders/data/redux/ProviderData.dart';
+import 'package:plus_dart/builders/util/CodeUtil.dart';
 
 class ProviderFileData {
   final List<ProviderData> classDataList;

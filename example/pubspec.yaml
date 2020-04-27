@@ -9,7 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  plus_generator:
+  plus_dart:
     path: ..
 
 dev_dependencies:

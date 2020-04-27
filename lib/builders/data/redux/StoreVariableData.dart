@@ -1,5 +1,5 @@
-import 'package:plus_generator/builders/config/Name.dart';
-import 'package:plus_generator/builders/data/redux/ProviderData.dart';
+import 'package:plus_dart/builders/config/Name.dart';
+import 'package:plus_dart/builders/data/redux/ProviderData.dart';
 
 class StoreVariableData {
   final ProviderData provider;
