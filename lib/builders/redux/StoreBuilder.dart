@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:plus_dart/builders/base/BaseBuilder.dart';
-import 'package:plus_dart/builders/base/visitor/GetMainFunction.dart';
+import 'package:plus_dart/builders/base/visitor/GetClasses.dart';
 import 'package:plus_dart/builders/config/FileExtensions.dart';
 import 'package:plus_dart/builders/data/redux/ProviderFileData.dart';
 import 'package:plus_dart/builders/data/redux/StoreFileData.dart';
 import 'package:plus_dart/builders/util/CodeUtil.dart';
+import 'package:plus_dart/builders/util/TypeUtil.dart';
 
 class StoreBuilder extends BaseBuilder {
 
@@ -22,17 +23,26 @@ class StoreBuilder extends BaseBuilder {
     '.dart': [FileExtensions.Store]
   };
 
+  ClassElement _getStoreClass(List<ClassElement> list) {
+    if (list == null || list.length <= 0) return null;
+    for (final item in list) {
+      if (TypeUtil.isStore(item)) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
   @override
   Future buildSource(LibraryElement library, BuildStep buildStep) async {
-    final visitor = GetMainFunction();
-    final uriStr = buildStep.inputId.uri.toString();
-
+    final visitor = GetClasses();
     library.visitChildren(visitor);
 
-    if (visitor.value == null || !uriStr
-        .startsWith('package:') || !_data.isValid) return;
+    final storeClass = _getStoreClass(visitor.value);
+    if (storeClass == null || !_data.isValid) return;
 
-    final code = await _data.getCode(buildStep.resolver);
+    final code = await _data.getCode(buildStep.resolver, storeClass, buildStep.inputId);
     final output = buildStep.inputId.changeExtension(FileExtensions.Store);
 
     await CodeUtil.writeToFile(buildStep, output, code);

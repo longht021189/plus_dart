@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:plus_dart/builders/config/Name.dart';
 import 'package:plus_dart/builders/config/UriList.dart';
@@ -16,6 +17,7 @@ class StoreFileData {
 
   List<StoreVariableData> _variableList = List();
   Set<Uri> _importList = HashSet.of([UriList.async]);
+  String _implementName;
 
   void addProvider(ProviderFileData data, AssetId source) {
     _isValid = true;
@@ -26,7 +28,14 @@ class StoreFileData {
     }
   }
 
-  Future<String> getCode(Resolver resolver) async {
+  Future<String> getCode(Resolver resolver, ClassElement element, AssetId aId) async {
+    _importList.add(aId.uri);
+    _implementName = element.name;
+
+    return await _getCode(resolver);
+  }
+
+  Future<String> _getCode(Resolver resolver) async {
     final importList = HashSet<Uri>();
     final initialVariables = StringBuffer();
     final variableSendActionMap = HashMap<DartType, StringBuffer>();
@@ -67,13 +76,13 @@ class StoreFileData {
 
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
-      ..writeln('class ${Name.classStore} {')
+      ..writeln('abstract class ${Name.classStore} {')
       ..writeln(initialVariables.toString())
       ..writeln(streamContents.toString())
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendActionContents.toString())
       ..writeln('}')
-      ..writeln(CodeUtil.singleton(Name.classStore))
+      ..writeln(CodeUtil.storeConstructor(Name.classStore, _implementName))
       ..writeln('}');
 
     return code.toString();

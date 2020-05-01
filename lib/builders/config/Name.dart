@@ -4,6 +4,7 @@ class Name {
   Name._internal();
 
   static String annotationLazy = "lazy";
+  static String annotationStore = "store";
   static String annotationLocal = "local";
   static String methodSendAction = "sendAction";
   static String methodSendActionParam = "value";

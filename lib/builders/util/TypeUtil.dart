@@ -10,17 +10,27 @@ class TypeUtil {
   static bool isLazy(ClassElement value) {
     for (final data in value.metadata) {
       if (data.element.name == Name.annotationLazy
-          && data.element.librarySource.uri == UriList.lazy) {
+          && data.element.librarySource.uri == UriList.annotations) {
         return true;
       }
     }
     return isLocal(value);
   }
 
+  static bool isStore(ClassElement value) {
+    for (final data in value.metadata) {
+      if (data.element.name == Name.annotationStore
+          && data.element.librarySource.uri == UriList.annotations) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static bool isLocal(ClassElement value) {
     for (final data in value.metadata) {
       if (data.element.name == Name.annotationLocal
-          && data.element.librarySource.uri == UriList.local) {
+          && data.element.librarySource.uri == UriList.annotations) {
         return true;
       }
     }
