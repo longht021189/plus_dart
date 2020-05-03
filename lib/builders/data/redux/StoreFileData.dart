@@ -7,6 +7,7 @@ import 'package:build/build.dart';
 import 'package:plus_dart/builders/config/Name.dart';
 import 'package:plus_dart/builders/config/UriList.dart';
 import 'package:plus_dart/builders/data/redux/ProviderFileData.dart';
+import 'package:plus_dart/builders/data/redux/StoreMethod.dart';
 import 'package:plus_dart/builders/data/redux/StoreVariableData.dart';
 import 'package:plus_dart/builders/util/CodeUtil.dart';
 import 'package:plus_dart/builders/util/TypeUtil.dart';
@@ -18,6 +19,7 @@ class StoreFileData {
   List<StoreVariableData> _variableList = List();
   Set<Uri> _importList = HashSet.of([UriList.async]);
   String _implementName;
+  Map<DartType, StoreMethod> _methodMap = HashMap();
 
   void addProvider(ProviderFileData data, AssetId source) {
     _isValid = true;
@@ -31,6 +33,22 @@ class StoreFileData {
   Future<String> getCode(Resolver resolver, ClassElement element, AssetId aId) async {
     _importList.add(aId.uri);
     _implementName = element.name;
+
+    for (final method in element.methods) {
+      if (method.isPublic && !method.isAbstract 
+          && !method.isStatic && method.parameters.isEmpty
+          && TypeUtil.isOverride(method)) {
+        if (_methodMap.containsKey(method.returnType)) {
+          throw 'Not support multi ${method.returnType}.';
+        }
+
+        await TypeUtil.getImportList(
+            method.returnType, _importList, resolver);
+
+        _methodMap[method.returnType] = StoreMethod(
+            method.name, method.returnType, isAbstract: true);
+      }
+    }    
 
     return await _getCode(resolver);
   }
@@ -82,8 +100,13 @@ class StoreFileData {
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendActionContents.toString())
       ..writeln('}')
-      ..writeln(CodeUtil.storeConstructor(Name.classStore, _implementName))
-      ..writeln('}');
+      ..writeln(CodeUtil.storeConstructor(Name.classStore, _implementName));
+    
+    for (final entry in _methodMap.entries) {
+      code.write(entry.value.getCode());
+    }
+    
+    code.writeln('}');
 
     return code.toString();
   }

@@ -7,6 +7,16 @@ import 'package:plus_dart/builders/config/UriList.dart';
 class TypeUtil {
   TypeUtil._internal();
 
+  static bool isOverride(MethodElement value) {
+    for (final data in value.metadata) {
+      if (data.element.name == Name.annotationOverride
+          && data.element.librarySource.uri == UriList.core) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static bool isLazy(ClassElement value) {
     for (final data in value.metadata) {
       if (data.element.name == Name.annotationLazy
@@ -78,5 +88,16 @@ class TypeUtil {
       }
     }
     return null;
+  }
+
+  static List<ParameterElement> getArgs(ClassElement value) {
+    final method = value.constructors[0];
+    final result = List<ParameterElement>();
+
+    for (final item in method.parameters) {
+      result.add(item);
+    }
+
+    return result;
   }
 }

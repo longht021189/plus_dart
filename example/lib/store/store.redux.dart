@@ -17,14 +17,11 @@ import 'package:example/reducer/AppReducerWithGeneric.provider.dart';
 import 'package:example/state/AppState.dart';
 
 abstract class Store {
-  final _varTestArgsProvider = TestArgsProvider();
   TestLocalProvider _varTestLocalProvider;
+  final _varTestArgsProvider = TestArgsProvider();
   AppReducerLazyProvider _varAppReducerLazyProvider;
   final _varAppReducerWithGenericProvider = AppReducerWithGenericProvider();
   final _varAppReducerProvider = AppReducerProvider();
-
-  Stream<TestArgsState<String>> get streamTestArgsState =>
-      _varTestArgsProvider.stream;
 
   Stream<TestState<String>> get streamTestState {
     if (_varTestLocalProvider == null || _varTestLocalProvider.isClosed) {
@@ -32,6 +29,9 @@ abstract class Store {
     }
     return _varTestLocalProvider.stream;
   }
+
+  Stream<TestArgsState<String>> get streamTestArgsState =>
+      _varTestArgsProvider.stream;
 
   Stream<HomeState> get streamHomeState {
     if (_varAppReducerLazyProvider == null ||
@@ -57,16 +57,18 @@ abstract class Store {
       await _varAppReducerWithGenericProvider.sendAction(value);
 
       await _varAppReducerProvider.sendAction(value);
+    } else if (value is TestArgsAction) {
+      await _varTestArgsProvider.sendAction(value);
     } else if (value is TestAction) {
       if (_varTestLocalProvider != null && !_varTestLocalProvider.isClosed) {
         await _varTestLocalProvider.sendAction(value);
       }
-    } else if (value is TestArgsAction) {
-      await _varTestArgsProvider.sendAction(value);
     }
   }
 
   factory Store() => StoreImpl();
 
   Store.unused();
+
+  String provideForTestArgs();
 }

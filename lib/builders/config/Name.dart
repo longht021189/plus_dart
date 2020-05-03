@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/element.dart';
 class Name {
   Name._internal();
 
+  static String annotationOverride = "override";
   static String annotationLazy = "lazy";
   static String annotationStore = "store";
   static String annotationLocal = "local";
@@ -17,5 +18,9 @@ class Name {
 
   static String getProviderName(ClassElement targetType) {
     return "${targetType.name}Provider";
+  }
+
+  static String getParamName(int index) {
+    return 'param_$index';
   }
 }

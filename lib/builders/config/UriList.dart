@@ -5,4 +5,5 @@ class UriList {
   static final Uri reducer = Uri.parse('package:plus_dart/redux/Reducer.dart');
   static final Uri annotations = Uri.parse('package:plus_dart/redux/Annotations.dart');
   static final Uri async = Uri.parse('dart:async');
+  static final Uri core = Uri.parse('dart:core');
 }

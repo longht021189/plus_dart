@@ -7,5 +7,5 @@ import 'package:example/reducer/TestArgs.dart';
 
 class TestArgsProvider
     extends Provider<TestArgsState<String>, TestArgsAction, TestArgs> {
-  TestArgsProvider() : super(TestArgs());
+  TestArgsProvider() : super(TestArgs(param_0));
 }
