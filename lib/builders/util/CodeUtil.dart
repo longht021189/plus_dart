@@ -19,8 +19,9 @@ class CodeUtil {
       ..writeln()
       ..writeln(code);
 
+    // TODO fix cannot add uri in formatter in windows
     await buildStep.writeAsString(output,
-        _formatter.format(contents.toString(), uri: output.uri));
+        _formatter.format(contents.toString()/*, uri: output.uri*/));
   }
 
   static String importFile(Uri uri) {

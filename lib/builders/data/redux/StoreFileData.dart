@@ -39,7 +39,7 @@ class StoreFileData {
           && !method.isStatic && method.parameters.isEmpty
           && TypeUtil.isOverride(method)) {
         if (_methodMap.containsKey(method.returnType)) {
-          throw 'Not support multi ${method.returnType}.';
+          throw UnimplementedError('Not support multi ${method.returnType}.');
         }
 
         await TypeUtil.getImportList(
@@ -48,7 +48,17 @@ class StoreFileData {
         _methodMap[method.returnType] = StoreMethod(
             method.name, method.returnType, isAbstract: true);
       }
-    }    
+    }
+
+    for (final item in _variableList) {
+      for (final param in item.provider.args) {
+        if (!_methodMap.containsKey(param.type)) {
+          throw UnimplementedError('${param.type} is not found.');
+        }
+
+        item.params.add(_methodMap[param.type]);
+      }
+    }
 
     return await _getCode(resolver);
   }

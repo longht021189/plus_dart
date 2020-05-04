@@ -10,5 +10,5 @@ class TestLocalProvider
   TestLocalProvider.createWith(TestLocal reducer)
       : super(reducer, isLocal: true);
   TestLocalProvider() : super(TestLocal(), isLocal: true);
-  static const key = 'b22658e8-3a76-48ff-84d8-598061bccc25';
+  static const key = 'f36fac8e-7e06-4147-a823-f2e852b907b2';
 }

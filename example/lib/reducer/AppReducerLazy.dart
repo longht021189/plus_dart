@@ -2,7 +2,6 @@ import 'package:example/state/AppStateAction.dart';
 import 'package:example/state/HomeState.dart';
 import 'package:plus_dart/base.dart';
 
-@lazy
 class AppReducerLazy extends Reducer<HomeState, AppStateAction> {
 
   @override

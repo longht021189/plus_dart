@@ -20,7 +20,7 @@ class ProviderData {
       , className = classType.name
       , key = TypeUtil.getKey(classType)
       , isLocal = TypeUtil.isLocal(classType)
-      , isLazy = TypeUtil.isLazy(classType)
+      , isLazy = true
       , args = TypeUtil.getArgs(classType);
 
   Future getImportList(Set<Uri> set, Resolver resolver) async {

@@ -10,4 +10,8 @@ class StoreMethod {
   String getCode() {
     return '$returnType $name();';
   }
+
+  String getCall() {
+    return '$name()';
+  }
 }

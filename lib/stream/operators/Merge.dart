@@ -12,7 +12,7 @@ class _Merge<T> extends Stream<T> {
   @override
   StreamSubscription<T> listen(void onData(T event),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return _MergeSubscription();
+    return _MergeSubscription(streams.map((e) => e.listen(onData)));
   }
 }
 

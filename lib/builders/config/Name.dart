@@ -4,7 +4,6 @@ class Name {
   Name._internal();
 
   static String annotationOverride = "override";
-  static String annotationLazy = "lazy";
   static String annotationStore = "store";
   static String annotationReduxKey = "ReduxKey";
   static String annotationLocal = "local";
