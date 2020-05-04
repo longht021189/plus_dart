@@ -9,5 +9,7 @@ import 'package:example/state/HomeState.dart';
 
 class AppReducerLazyProvider
     extends Provider<HomeState, AppStateAction, AppReducerLazy> {
+  AppReducerLazyProvider.createWith(AppReducerLazy reducer) : super(reducer);
   AppReducerLazyProvider() : super(AppReducerLazy());
+  static const key = '82ce4728-be5b-476a-aa7f-70c345f5d176';
 }

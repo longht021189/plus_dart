@@ -10,13 +10,17 @@ class ProviderData {
   final DartType actionType;
   final String name;
   final String className;
+  final String key;
   final bool isLazy;
   final bool isLocal;
   final List<ParameterElement> args;
 
+  static const a = '';
+
   ProviderData(this.classType, this.stateType, this.actionType)
       : name = Name.getProviderName(classType)
       , className = classType.name
+      , key = TypeUtil.getKey(classType)
       , isLocal = TypeUtil.isLocal(classType)
       , isLazy = TypeUtil.isLazy(classType)
       , args = TypeUtil.getArgs(classType);
@@ -28,6 +32,26 @@ class ProviderData {
     for (final item in args) {
       await TypeUtil.getImportList(item.type, set, resolver);
     }
+  }
+
+  String _getArgs1() {
+    if (args.isEmpty) return '';
+
+    final code = StringBuffer();
+
+    for (int i = 0; i < args.length; ++i) {
+      if (i > 0) {
+        code.write(', ');
+      }
+
+      final item = args[i];
+      final name = Name.getParamName(i);
+      final type = item.type;
+
+      code.write('$type $name');
+    }
+
+    return code.toString();
   }
 
   String _getArgs2() {
@@ -53,9 +77,15 @@ class ProviderData {
   }
 
   Future<String> getCode() async {
-    return "class $name extends "
-        "Provider<$stateType, $actionType, $className> {\n"
-        "$name(): super($className(${_getArgs2()})${isLocal ? ', isLocal: true' : ''});\n"
-        "}";
+    final local = isLocal ? ', isLocal: true' : '';
+
+    final code = StringBuffer()
+      ..writeln('class $name extends Provider<$stateType, $actionType, $className> {')
+      ..writeln('$name.createWith($className reducer): super(reducer $local);')
+      ..writeln('$name(${_getArgs1()}): super($className(${_getArgs2()}) $local);')
+      ..writeln('static const key = \'$key\';')
+      ..writeln('}');
+
+    return code.toString();
   }
 }

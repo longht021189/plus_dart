@@ -1,5 +1,6 @@
 import 'package:plus_dart/base.dart';
 
+@ReduxKey('Test')
 class TestArgs extends Reducer<TestArgsState<String>, TestArgsAction> {
 
   @override

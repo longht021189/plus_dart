@@ -17,11 +17,24 @@ import 'package:example/reducer/AppReducerWithGeneric.provider.dart';
 import 'package:example/state/AppState.dart';
 
 abstract class Store {
+  AppReducerLazyProvider _varAppReducerLazyProvider;
+  final _varAppReducerProvider = AppReducerProvider();
+  final _varAppReducerWithGenericProvider = AppReducerWithGenericProvider();
   TestLocalProvider _varTestLocalProvider;
   final _varTestArgsProvider = TestArgsProvider();
-  AppReducerLazyProvider _varAppReducerLazyProvider;
-  final _varAppReducerWithGenericProvider = AppReducerWithGenericProvider();
-  final _varAppReducerProvider = AppReducerProvider();
+
+  Stream<HomeState> get streamHomeState {
+    if (_varAppReducerLazyProvider == null ||
+        _varAppReducerLazyProvider.isClosed) {
+      _varAppReducerLazyProvider = AppReducerLazyProvider();
+    }
+    return _varAppReducerLazyProvider.stream;
+  }
+
+  Stream<AppState> get streamAppState => _varAppReducerProvider.stream;
+
+  Stream<AppStateGeneric<AppState>> get streamAppStateGeneric =>
+      _varAppReducerWithGenericProvider.stream;
 
   Stream<TestState<String>> get streamTestState {
     if (_varTestLocalProvider == null || _varTestLocalProvider.isClosed) {
@@ -33,19 +46,6 @@ abstract class Store {
   Stream<TestArgsState<String>> get streamTestArgsState =>
       _varTestArgsProvider.stream;
 
-  Stream<HomeState> get streamHomeState {
-    if (_varAppReducerLazyProvider == null ||
-        _varAppReducerLazyProvider.isClosed) {
-      _varAppReducerLazyProvider = AppReducerLazyProvider();
-    }
-    return _varAppReducerLazyProvider.stream;
-  }
-
-  Stream<AppStateGeneric<AppState>> get streamAppStateGeneric =>
-      _varAppReducerWithGenericProvider.stream;
-
-  Stream<AppState> get streamAppState => _varAppReducerProvider.stream;
-
   Future sendAction(dynamic value) async {
     if (value is AppStateAction) {
       if (_varAppReducerLazyProvider == null ||
@@ -54,9 +54,9 @@ abstract class Store {
       }
       await _varAppReducerLazyProvider.sendAction(value);
 
-      await _varAppReducerWithGenericProvider.sendAction(value);
-
       await _varAppReducerProvider.sendAction(value);
+
+      await _varAppReducerWithGenericProvider.sendAction(value);
     } else if (value is TestArgsAction) {
       await _varTestArgsProvider.sendAction(value);
     } else if (value is TestAction) {

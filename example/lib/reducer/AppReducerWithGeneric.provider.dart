@@ -10,5 +10,8 @@ import 'package:example/state/AppState.dart';
 
 class AppReducerWithGenericProvider extends Provider<AppStateGeneric<AppState>,
     AppStateAction, AppReducerWithGeneric> {
+  AppReducerWithGenericProvider.createWith(AppReducerWithGeneric reducer)
+      : super(reducer);
   AppReducerWithGenericProvider() : super(AppReducerWithGeneric());
+  static const key = '076794de-bbf5-4af6-a601-ba93f0dc35d9';
 }

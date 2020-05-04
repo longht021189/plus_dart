@@ -3,9 +3,34 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:plus_dart/builders/config/Name.dart';
 import 'package:plus_dart/builders/config/UriList.dart';
+import 'package:uuid/uuid.dart';
 
 class TypeUtil {
   TypeUtil._internal();
+
+  static Uuid _uuid = Uuid();
+
+  static String getKey(ClassElement value) {
+    final key = _getKey(value);
+    if (key != null) {
+      return key;
+    } else {
+      return _uuid.v4();
+    }
+  }
+
+  static String _getKey(ClassElement value) {
+    for (final data in value.metadata) {
+      final value = data.computeConstantValue();
+      final name = value.type.element.name;
+
+      if (name == Name.annotationReduxKey
+          && data.element.librarySource.uri == UriList.annotations) {
+        return value.getField('value').toStringValue();
+      }
+    }
+    return null;
+  }
 
   static bool isOverride(MethodElement value) {
     for (final data in value.metadata) {

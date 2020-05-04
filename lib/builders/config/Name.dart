@@ -6,6 +6,7 @@ class Name {
   static String annotationOverride = "override";
   static String annotationLazy = "lazy";
   static String annotationStore = "store";
+  static String annotationReduxKey = "ReduxKey";
   static String annotationLocal = "local";
   static String methodSendAction = "sendAction";
   static String methodSendActionParam = "value";
