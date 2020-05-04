@@ -15,8 +15,6 @@ class ProviderData {
   final bool isLocal;
   final List<ParameterElement> args;
 
-  static const a = '';
-
   ProviderData(this.classType, this.stateType, this.actionType)
       : name = Name.getProviderName(classType)
       , className = classType.name
