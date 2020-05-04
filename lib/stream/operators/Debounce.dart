@@ -7,7 +7,7 @@ class _Debounce<T> extends Stream<T> {
   }
 }
 
-class _DebounceSubscription<T> extends StreamSubscription<T> {
+class _DebounceSubscription<T> implements StreamSubscription<T> {
   @override
   Future<E> asFuture<E>([E futureValue]) {
     throw UnimplementedError();

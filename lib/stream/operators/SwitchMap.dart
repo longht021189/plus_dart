@@ -7,7 +7,7 @@ class _SwitchMap<T> extends Stream<T> {
   }
 }
 
-class _SwitchMapSubscription<T> extends StreamSubscription<T> {
+class _SwitchMapSubscription<T> implements StreamSubscription<T> {
   @override
   Future<E> asFuture<E>([E futureValue]) {
     throw UnimplementedError();
