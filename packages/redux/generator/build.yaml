@@ -1,0 +1,14 @@
+builders:
+  reduxReducerProviderGenerator:
+    import: "package:plus_redux_generator/builders.dart"
+    builder_factories: ["reduxReducerProviderGenerator"]
+    build_extensions: {".dart": [".provider.dart"]}
+    auto_apply: dependents
+    build_to: source
+
+  reduxStoreGenerator:
+    import: "package:plus_redux_generator/builders.dart"
+    builder_factories: ["reduxStoreGenerator"]
+    build_extensions: {".dart": [".redux.dart"]}
+    auto_apply: dependents
+    build_to: source

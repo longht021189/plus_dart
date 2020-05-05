@@ -1,0 +1,15 @@
+// **************************************************************************
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// **************************************************************************
+
+import 'package:example/state/AppStateAction.dart';
+import 'package:plus_redux/redux.dart';
+import 'package:example/reducer/AppReducer.dart';
+import 'package:example/state/AppState.dart';
+
+class AppReducerProvider
+    extends Provider<AppState, AppStateAction, AppReducer> {
+  AppReducerProvider.createWith(AppReducer reducer) : super(reducer);
+  AppReducerProvider() : super(AppReducer());
+  static const key = '2c79ffad-1ebd-4c88-9007-56f6c391d67f';
+}
