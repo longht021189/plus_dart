@@ -1,0 +1,3 @@
+[submodule "packages/hive"]
+	path = packages/hive
+	url = git@github.com:longht021189/hive.git
