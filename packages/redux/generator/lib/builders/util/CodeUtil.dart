@@ -45,13 +45,4 @@ class CodeUtil {
 
     return code.toString();
   }
-
-  static String storeConstructor(String typeName, String implementName) {
-    final code = StringBuffer()
-      ..writeln('factory $typeName() => $implementName();')
-      ..writeln()
-      ..writeln('$typeName.unused();');
-
-    return code.toString();
-  }
 }

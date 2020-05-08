@@ -1,6 +1,5 @@
 ## TBD
 Implement Redux Generator:
-  * Arguments for Reducer
   * Middleware
   * Save state
 
@@ -8,6 +7,8 @@ Implement Redux Generator:
 Implement Redux Generator:
   * Remove Lazy (All is Lazy)
   * *.provider.dart & *.store.dart => *.p.dart
+  * Merge all streams into one function
+  * Arguments for Reducer
 
 ## 0.0.1
 Implement Redux Generator:

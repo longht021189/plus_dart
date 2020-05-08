@@ -3,9 +3,10 @@
 // **************************************************************************
 
 import 'package:example/reducer/AppReducerWithGeneric.p.dart';
+import 'dart:collection';
 import 'package:example/reducer/TestArgs.dart';
-import 'package:example/reducer/TestLocal.dart';
 import 'package:example/state/AppStateAction.dart';
+import 'package:example/reducer/TestLocal.dart';
 import 'package:example/state/AppStateGeneric.dart';
 import 'package:example/reducer/AppReducerLazy.p.dart';
 import 'package:example/reducer/TestLocal.p.dart';
@@ -17,61 +18,29 @@ import 'package:example/store/store.dart';
 import 'package:example/state/AppState.dart';
 
 abstract class Store {
+  final _typeMap = HashMap<dynamic, String>();
   AppReducerProvider _varAppReducerProvider;
+  TestArgsProvider _varTestArgsProvider;
   AppReducerLazyProvider _varAppReducerLazyProvider;
   AppReducerWithGenericProvider _varAppReducerWithGenericProvider;
-  TestArgsProvider _varTestArgsProvider;
   TestLocalProvider _varTestLocalProvider;
 
+  void _parse<T>(String key) {
+    _typeMap[T] = key;
+  }
+
   Stream<T> getStream<T>([String key]) {
+    String temp;
     if (key != null) {
-      switch (key) {
-        case AppReducerProvider.key:
-          {
-            if (_varAppReducerProvider == null ||
-                _varAppReducerProvider.isClosed) {
-              _varAppReducerProvider = AppReducerProvider();
-            }
-            return _varAppReducerProvider.stream as Stream<T>;
-          }
-        case AppReducerLazyProvider.key:
-          {
-            if (_varAppReducerLazyProvider == null ||
-                _varAppReducerLazyProvider.isClosed) {
-              _varAppReducerLazyProvider = AppReducerLazyProvider();
-            }
-            return _varAppReducerLazyProvider.stream as Stream<T>;
-          }
-        case AppReducerWithGenericProvider.key:
-          {
-            if (_varAppReducerWithGenericProvider == null ||
-                _varAppReducerWithGenericProvider.isClosed) {
-              _varAppReducerWithGenericProvider =
-                  AppReducerWithGenericProvider();
-            }
-            return _varAppReducerWithGenericProvider.stream as Stream<T>;
-          }
-        case TestArgsProvider.key:
-          {
-            if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
-              _varTestArgsProvider = TestArgsProvider(provideForTestArgs());
-            }
-            return _varTestArgsProvider.stream as Stream<T>;
-          }
-        case TestLocalProvider.key:
-          {
-            if (_varTestLocalProvider == null ||
-                _varTestLocalProvider.isClosed) {
-              _varTestLocalProvider = TestLocalProvider();
-            }
-            return _varTestLocalProvider.stream as Stream<T>;
-          }
-        default:
-          throw UnimplementedError();
-      }
+      temp = key;
+    } else {
+      temp = _typeMap[T];
     }
-    switch (T) {
-      case AppState:
+    if (temp == null) {
+      throw UnimplementedError();
+    }
+    switch (temp) {
+      case AppReducerProvider.key:
         {
           if (_varAppReducerProvider == null ||
               _varAppReducerProvider.isClosed) {
@@ -79,7 +48,14 @@ abstract class Store {
           }
           return _varAppReducerProvider.stream as Stream<T>;
         }
-      case HomeState:
+      case TestArgsProvider.key:
+        {
+          if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
+            _varTestArgsProvider = TestArgsProvider(provideForTestArgs());
+          }
+          return _varTestArgsProvider.stream as Stream<T>;
+        }
+      case AppReducerLazyProvider.key:
         {
           if (_varAppReducerLazyProvider == null ||
               _varAppReducerLazyProvider.isClosed) {
@@ -87,7 +63,7 @@ abstract class Store {
           }
           return _varAppReducerLazyProvider.stream as Stream<T>;
         }
-      case AppStateGeneric:
+      case AppReducerWithGenericProvider.key:
         {
           if (_varAppReducerWithGenericProvider == null ||
               _varAppReducerWithGenericProvider.isClosed) {
@@ -95,14 +71,7 @@ abstract class Store {
           }
           return _varAppReducerWithGenericProvider.stream as Stream<T>;
         }
-      case TestArgsState:
-        {
-          if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
-            _varTestArgsProvider = TestArgsProvider(provideForTestArgs());
-          }
-          return _varTestArgsProvider.stream as Stream<T>;
-        }
-      case TestState:
+      case TestLocalProvider.key:
         {
           if (_varTestLocalProvider == null || _varTestLocalProvider.isClosed) {
             _varTestLocalProvider = TestLocalProvider();
@@ -148,7 +117,12 @@ abstract class Store {
 
   factory Store() => StoreImpl();
 
-  Store.unused();
-
+  Store.unused() {
+    _parse<AppState>(AppReducerProvider.key);
+    _parse<TestArgsState<String>>(TestArgsProvider.key);
+    _parse<HomeState>(AppReducerLazyProvider.key);
+    _parse<AppStateGeneric<AppState>>(AppReducerWithGenericProvider.key);
+    _parse<TestState<String>>(TestLocalProvider.key);
+  }
   String provideForTestArgs();
 }

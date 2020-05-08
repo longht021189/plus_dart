@@ -90,21 +90,15 @@ class StoreFileData {
   }
 
   Future<String> _getStreamMethodCode() async {
-    final streamContents = StringBuffer();
+    final streamContents = StringBuffer()
+      ..writeln('String temp;')
+      ..writeln('if (key != null) { temp = key; }')
+      ..writeln('else { temp = _typeMap[T]; }')
+      ..writeln('if (temp == null) { throw UnimplementedError(); }');
 
-    streamContents.writeln('if (key != null) { switch(key) {');
+    streamContents.writeln('switch(temp) {');
     for (final item in _variableList) {
       streamContents.writeln('case ${item.provider.name}.key:{');
-      streamContents.writeln(await item.getStream());
-      streamContents.writeln('}');
-    }
-    streamContents.writeln('default:');
-    streamContents.writeln('throw UnimplementedError();');
-    streamContents.writeln('}}');
-
-    streamContents.writeln('switch(T) {');
-    for (final item in _variableList) {
-      streamContents.writeln('case ${item.provider.stateType.element.name}:{');
       streamContents.writeln(await item.getStream());
       streamContents.writeln('}');
     }
@@ -115,12 +109,28 @@ class StoreFileData {
     return streamContents.toString();
   }
 
-  Future<String> _getCode(Resolver resolver) async {
-    final importList = HashSet<Uri>();
-    final initialVariables = StringBuffer();
-    final variableSendActionMap = HashMap<DartType, StringBuffer>();
+  Future<String> _getParseTypeMethod() async {
+    final code = StringBuffer()
+      ..writeln('void _parse<T>(String key) {')
+      ..writeln('_typeMap[T] = key;')
+      ..writeln('}');
 
-    importList.addAll(_importList);
+    return code.toString();
+  }
+
+  Future<String> _getConstructorCode() async {
+    final code = StringBuffer();
+
+    for (final item in _variableList) {
+      code.writeln('_parse<${item.provider.stateType}>(${item.provider.name}.key);');
+    }
+
+    return code.toString();
+  }
+
+  Future<String> _getVariablesCode(Resolver resolver, Set<Uri> importList, Map<DartType, StringBuffer> variableSendActionMap) async {
+    final initialVariables = StringBuffer();
+    initialVariables.writeln('final _typeMap = HashMap<dynamic, String>();');
 
     for (final item in _variableList) {
       initialVariables.writeln(await item.getInitial());
@@ -136,6 +146,19 @@ class StoreFileData {
           item.provider.stateType, importList, resolver);
     }
 
+    return initialVariables.toString();
+  }
+
+  Future<String> _getCode(Resolver resolver) async {
+    final importList = HashSet<Uri>();
+    final variableSendActionMap = HashMap<DartType, StringBuffer>();
+
+    importList.add(UriList.collection);
+    importList.addAll(_importList);
+
+    final variables = await _getVariablesCode(
+      resolver, importList, variableSendActionMap);
+
     final sendMethod = await _getSendMethodCode(
       resolver, importList, variableSendActionMap);
 
@@ -144,17 +167,22 @@ class StoreFileData {
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
       ..writeln('abstract class ${Name.classStore} {')
-      ..writeln(initialVariables.toString())
+      ..writeln(variables)
+      ..writeln(await _getParseTypeMethod())
       ..writeln('Stream<T> getStream<T>([String key]) {')
       ..writeln(streamMethod)
       ..writeln('}')
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendMethod)
       ..writeln('}')
-      ..writeln(CodeUtil.storeConstructor(Name.classStore, _implementName));
+      ..writeln('factory ${Name.classStore}() => ${_implementName}();')
+      ..writeln()
+      ..writeln('${Name.classStore}.unused() {')
+      ..writeln(await _getConstructorCode())
+      ..writeln('}');
     
     for (final entry in _methodMap.entries) {
-      code.write(entry.value.getCode());
+      code.writeln(entry.value.getCode());
     }
     
     code.writeln('}');

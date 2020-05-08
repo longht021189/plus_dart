@@ -11,5 +11,5 @@ class AppReducerProvider
     extends Provider<AppState, AppStateAction, AppReducer> {
   AppReducerProvider.createWith(AppReducer reducer) : super(reducer);
   AppReducerProvider() : super(AppReducer());
-  static const key = '7bae86e0-fc83-447e-afba-aea7a3e9e879';
+  static const key = '99658246-ab8b-465f-9a87-2f708e0eb021';
 }
