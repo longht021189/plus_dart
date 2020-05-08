@@ -16,14 +16,18 @@ class StoreFileData {
   bool get isValid => _isValid;
   bool _isValid = false;
 
+  List<ProviderFileData> _providerDataList = List();
   List<StoreVariableData> _variableList = List();
   Set<Uri> _importList = HashSet.of([UriList.async]);
   String _implementName;
   Map<DartType, StoreMethod> _methodMap = HashMap();
 
+  List<ProviderFileData> get providerFileList => _providerDataList;
+
   void addProvider(ProviderFileData data, AssetId source) {
     _isValid = true;
     _importList.add(source.uri);
+    _providerDataList.add(data);
 
     for (final item in data.classDataList) {
       _variableList.add(StoreVariableData(item));
@@ -63,33 +67,10 @@ class StoreFileData {
     return await _getCode(resolver);
   }
 
-  Future<String> _getCode(Resolver resolver) async {
-    final importList = HashSet<Uri>();
-    final initialVariables = StringBuffer();
-    final variableSendActionMap = HashMap<DartType, StringBuffer>();
+  Future<String> _getSendMethodCode(Resolver resolver, Set<Uri> importList, Map<DartType, StringBuffer> variableSendActionMap) async {
     final sendActionContents = StringBuffer();
-    final streamContents = StringBuffer();
 
     bool sendActionFirst = true;
-    importList.addAll(_importList);
-
-    for (final item in _variableList) {
-      initialVariables.writeln(await item.getInitial());
-
-      if (!variableSendActionMap.containsKey(item.provider.actionType)) {
-        variableSendActionMap[item.provider.actionType] = StringBuffer();
-      }
-
-      variableSendActionMap[item.provider.actionType]
-          .writeln(await item.getSendAction(Name.methodSendActionParam));
-
-      streamContents
-          ..writeln(await item.getStream())
-          ..writeln();
-
-      await TypeUtil.getImportList(
-          item.provider.stateType, importList, resolver);
-    }
 
     for (final item in variableSendActionMap.entries) {
       sendActionContents
@@ -102,13 +83,73 @@ class StoreFileData {
       await TypeUtil.getImportList(item.key, importList, resolver);
     }
 
+    sendActionContents
+      .writeln(' else { throw UnimplementedError(); }');
+
+    return sendActionContents.toString();
+  }
+
+  Future<String> _getStreamMethodCode() async {
+    final streamContents = StringBuffer();
+
+    streamContents.writeln('if (key != null) { switch(key) {');
+    for (final item in _variableList) {
+      streamContents.writeln('case ${item.provider.name}.key:{');
+      streamContents.writeln(await item.getStream());
+      streamContents.writeln('}');
+    }
+    streamContents.writeln('default:');
+    streamContents.writeln('throw UnimplementedError();');
+    streamContents.writeln('}}');
+
+    streamContents.writeln('switch(T) {');
+    for (final item in _variableList) {
+      streamContents.writeln('case ${item.provider.stateType.element.name}:{');
+      streamContents.writeln(await item.getStream());
+      streamContents.writeln('}');
+    }
+    streamContents.writeln('default:');
+    streamContents.writeln('throw UnimplementedError();');
+    streamContents.writeln('}');
+
+    return streamContents.toString();
+  }
+
+  Future<String> _getCode(Resolver resolver) async {
+    final importList = HashSet<Uri>();
+    final initialVariables = StringBuffer();
+    final variableSendActionMap = HashMap<DartType, StringBuffer>();
+
+    importList.addAll(_importList);
+
+    for (final item in _variableList) {
+      initialVariables.writeln(await item.getInitial());
+
+      if (!variableSendActionMap.containsKey(item.provider.actionType)) {
+        variableSendActionMap[item.provider.actionType] = StringBuffer();
+      }
+
+      variableSendActionMap[item.provider.actionType]
+          .writeln(await item.getSendAction(Name.methodSendActionParam));
+
+      await TypeUtil.getImportList(
+          item.provider.stateType, importList, resolver);
+    }
+
+    final sendMethod = await _getSendMethodCode(
+      resolver, importList, variableSendActionMap);
+
+    final streamMethod = await _getStreamMethodCode();
+
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
       ..writeln('abstract class ${Name.classStore} {')
       ..writeln(initialVariables.toString())
-      ..writeln(streamContents.toString())
+      ..writeln('Stream<T> getStream<T>([String key]) {')
+      ..writeln(streamMethod)
+      ..writeln('}')
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
-      ..writeln(sendActionContents.toString())
+      ..writeln(sendMethod)
       ..writeln('}')
       ..writeln(CodeUtil.storeConstructor(Name.classStore, _implementName));
     

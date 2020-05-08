@@ -36,11 +36,24 @@ class StoreBuilder extends BaseBuilder {
 
   @override
   Future buildSource(LibraryElement library, BuildStep buildStep) async {
+    if (!_data.isValid) return;
+
     final visitor = GetClasses();
     library.visitChildren(visitor);
 
     final storeClass = _getStoreClass(visitor.value);
-    if (storeClass == null || !_data.isValid) return;
+    final it = _data.providerFileList
+      .where((element) => buildStep.inputId.uri == element.source.uri);
+    
+    if (it.isNotEmpty) {
+      final fileData = it.first;
+      final code = await fileData.getCode(buildStep.resolver);
+      final output = fileData.source.changeExtension(FileExtensions.Store);
+
+      await CodeUtil.writeToFile(buildStep, output, code);
+    }
+
+    if (storeClass == null) return;
 
     final code = await _data.getCode(buildStep.resolver, storeClass, buildStep.inputId);
     final output = buildStep.inputId.changeExtension(FileExtensions.Store);

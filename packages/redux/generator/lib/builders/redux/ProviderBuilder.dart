@@ -9,7 +9,6 @@ import 'package:plus_redux_generator/builders/config/FileExtensions.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderData.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderFileData.dart';
 import 'package:plus_redux_generator/builders/redux/StoreBuilder.dart';
-import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
 import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class ProviderBuilder extends BaseBuilder {
@@ -40,12 +39,9 @@ class ProviderBuilder extends BaseBuilder {
 
     if (fileData.classDataList.isEmpty) return;
 
-    final code = await fileData.getCode(buildStep.resolver);
-    final output = buildStep.inputId.changeExtension(FileExtensions.Provider);
+    final output = buildStep.inputId.changeExtension(FileExtensions.Store);
 
     StoreBuilder.addProvider(fileData, output);
-
-    await CodeUtil.writeToFile(buildStep, output, code);
   }
 
   List<ClassElement> _getAllClasses(LibraryElement library) {

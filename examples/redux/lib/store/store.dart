@@ -1,5 +1,5 @@
 import 'package:plus_redux/redux.dart';
-import 'store.redux.dart';
+import 'store.p.dart';
 
 @store
 class StoreImpl extends Store {

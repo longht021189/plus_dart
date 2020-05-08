@@ -60,12 +60,12 @@ class StoreVariableData {
   Future<String> getStream() async {
     if (provider.isLazy) {
       final code = StringBuffer();
-      code.writeln("Stream<${provider.stateType}> get stream${provider.stateType.element.name} {");
       code.writeln("if ($name == null || $name.isClosed) { $name = ${_createInstance()};}");
-      code.writeln("return $name.stream;");
-      code.writeln("}");
+      code.writeln("return $name.stream as Stream<T>;");
+
       return code.toString();
     }
-    return "Stream<${provider.stateType}> get stream${provider.stateType.element.name} => $name.stream;";
+
+    throw UnimplementedError();
   }
 }
