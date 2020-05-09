@@ -17,13 +17,14 @@ import 'package:example/reducer/AppReducer.p.dart';
 import 'package:example/store/store.dart';
 import 'package:example/state/AppState.dart';
 
-abstract class Store {
+class Store {
   final _typeMap = HashMap<dynamic, String>();
-  AppReducerProvider _varAppReducerProvider;
-  TestArgsProvider _varTestArgsProvider;
+  final StoreData _data;
   AppReducerLazyProvider _varAppReducerLazyProvider;
   AppReducerWithGenericProvider _varAppReducerWithGenericProvider;
+  AppReducerProvider _varAppReducerProvider;
   TestLocalProvider _varTestLocalProvider;
+  TestArgsProvider _varTestArgsProvider;
 
   void _parse<T>(String key) {
     _typeMap[T] = key;
@@ -40,21 +41,6 @@ abstract class Store {
       throw UnimplementedError();
     }
     switch (temp) {
-      case AppReducerProvider.key:
-        {
-          if (_varAppReducerProvider == null ||
-              _varAppReducerProvider.isClosed) {
-            _varAppReducerProvider = AppReducerProvider();
-          }
-          return _varAppReducerProvider.stream as Stream<T>;
-        }
-      case TestArgsProvider.key:
-        {
-          if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
-            _varTestArgsProvider = TestArgsProvider(provideForTestArgs());
-          }
-          return _varTestArgsProvider.stream as Stream<T>;
-        }
       case AppReducerLazyProvider.key:
         {
           if (_varAppReducerLazyProvider == null ||
@@ -71,12 +57,27 @@ abstract class Store {
           }
           return _varAppReducerWithGenericProvider.stream as Stream<T>;
         }
+      case AppReducerProvider.key:
+        {
+          if (_varAppReducerProvider == null ||
+              _varAppReducerProvider.isClosed) {
+            _varAppReducerProvider = AppReducerProvider();
+          }
+          return _varAppReducerProvider.stream as Stream<T>;
+        }
       case TestLocalProvider.key:
         {
           if (_varTestLocalProvider == null || _varTestLocalProvider.isClosed) {
             _varTestLocalProvider = TestLocalProvider();
           }
           return _varTestLocalProvider.stream as Stream<T>;
+        }
+      case TestArgsProvider.key:
+        {
+          if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
+            _varTestArgsProvider = TestArgsProvider(_data?.appKey);
+          }
+          return _varTestArgsProvider.stream as Stream<T>;
         }
       default:
         throw UnimplementedError();
@@ -85,11 +86,6 @@ abstract class Store {
 
   Future sendAction(dynamic value) async {
     if (value is AppStateAction) {
-      if (_varAppReducerProvider == null || _varAppReducerProvider.isClosed) {
-        _varAppReducerProvider = AppReducerProvider();
-      }
-      await _varAppReducerProvider.sendAction(value);
-
       if (_varAppReducerLazyProvider == null ||
           _varAppReducerLazyProvider.isClosed) {
         _varAppReducerLazyProvider = AppReducerLazyProvider();
@@ -101,28 +97,30 @@ abstract class Store {
         _varAppReducerWithGenericProvider = AppReducerWithGenericProvider();
       }
       await _varAppReducerWithGenericProvider.sendAction(value);
+
+      if (_varAppReducerProvider == null || _varAppReducerProvider.isClosed) {
+        _varAppReducerProvider = AppReducerProvider();
+      }
+      await _varAppReducerProvider.sendAction(value);
+    } else if (value is TestArgsAction<int>) {
+      if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
+        _varTestArgsProvider = TestArgsProvider(_data?.appKey);
+      }
+      await _varTestArgsProvider.sendAction(value);
     } else if (value is TestAction) {
       if (_varTestLocalProvider != null && !_varTestLocalProvider.isClosed) {
         await _varTestLocalProvider.sendAction(value);
       }
-    } else if (value is TestArgsAction) {
-      if (_varTestArgsProvider == null || _varTestArgsProvider.isClosed) {
-        _varTestArgsProvider = TestArgsProvider(provideForTestArgs());
-      }
-      await _varTestArgsProvider.sendAction(value);
     } else {
       throw UnimplementedError();
     }
   }
 
-  factory Store() => StoreImpl();
-
-  Store.unused() {
-    _parse<AppState>(AppReducerProvider.key);
-    _parse<TestArgsState<String>>(TestArgsProvider.key);
+  Store([StoreData data]) : _data = data {
     _parse<HomeState>(AppReducerLazyProvider.key);
     _parse<AppStateGeneric<AppState>>(AppReducerWithGenericProvider.key);
+    _parse<AppState>(AppReducerProvider.key);
     _parse<TestState<String>>(TestLocalProvider.key);
+    _parse<TestArgsState<String>>(TestArgsProvider.key);
   }
-  String provideForTestArgs();
 }

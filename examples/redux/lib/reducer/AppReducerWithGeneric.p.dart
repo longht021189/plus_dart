@@ -13,5 +13,5 @@ class AppReducerWithGenericProvider extends Provider<AppStateGeneric<AppState>,
   AppReducerWithGenericProvider.createWith(AppReducerWithGeneric reducer)
       : super(reducer);
   AppReducerWithGenericProvider() : super(AppReducerWithGeneric());
-  static const key = 'e7385f2b-ce6c-43de-a16b-bf9b176085c4';
+  static const key = 'de131b4f-b85c-4dd3-8464-db7b2e1c0241';
 }

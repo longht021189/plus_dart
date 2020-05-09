@@ -13,16 +13,101 @@ import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
 import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class StoreFileData {
-  bool get isValid => _isValid;
   bool _isValid = false;
 
   List<ProviderFileData> _providerDataList = List();
   List<StoreVariableData> _variableList = List();
   Set<Uri> _importList = HashSet.of([UriList.async]);
-  String _implementName;
-  Map<DartType, StoreMethod> _methodMap = HashMap();
+  String _dataName2;
+  Map<DartType, StoreMethod> _methodMap2 = HashMap();
+
+  FunctionElement _mainFunc;
+  bool _mainFuncMulti = false;
+  AssetId _mainFuncSource;
+
+  ClassElement _storeDataClass;
+  bool _storeDataClassMulti = false;
+  AssetId _storeDataClassSource;
 
   List<ProviderFileData> get providerFileList => _providerDataList;
+
+  Future<bool> isValid(Resolver resolver) async {
+    if (!_isValid) return false;
+
+    if (_storeDataClass != null) {
+      if (_storeDataClassMulti) {
+        throw UnimplementedError('Multi Store Data is Detected.');
+      }
+
+      await _parseData(resolver);
+    } else if (_mainFunc != null) {
+      if (_mainFuncMulti) {
+        throw UnimplementedError('Multi Main Function is Detected.');
+      }
+    } else {
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _parseData(Resolver resolver) async {
+    if (_dataName2 != null) return;
+
+    _dataName2 = _storeDataClass.name;
+
+    for (final method in _storeDataClass.methods) {
+      if (method.isPublic && method.parameters.isEmpty 
+          && !method.returnType.isVoid && !method.returnType.isDynamic) {
+        if (_methodMap2.containsKey(method.returnType)) {
+          throw UnimplementedError('Not support multi ${method.returnType}.');
+        }
+
+        await TypeUtil.getImportList(
+            method.returnType, _importList, resolver);
+
+        _methodMap2[method.returnType] = StoreMethod(
+            method.name, method.returnType, isStatic: method.isStatic);
+      }
+    }
+    for (final method in _storeDataClass.accessors) {
+      if (method.isPublic && method.parameters.isEmpty 
+          && !method.returnType.isVoid && !method.returnType.isDynamic) {
+        if (_methodMap2.containsKey(method.returnType)) {
+          throw UnimplementedError('Not support multi ${method.returnType}.');
+        }
+
+        await TypeUtil.getImportList(
+            method.returnType, _importList, resolver);
+
+        _methodMap2[method.returnType] = StoreMethod(
+            method.name, method.returnType, 
+            isStatic: method.isStatic, isGetter: true);
+      }
+    }
+    for (final method in _storeDataClass.fields) {
+      if (method.isPublic && !method.type.isVoid 
+          && !method.type.isDynamic 
+          && !_methodMap2.containsKey(method.type)) {
+        await TypeUtil.getImportList(
+            method.type, _importList, resolver);
+
+        _methodMap2[method.type] = StoreMethod(
+            method.name, method.type, 
+            isStatic: method.isStatic, isGetter: true);
+      }
+    }
+
+    for (final item in _variableList) {
+      for (final param in item.provider.args) {
+        if (!_methodMap2.containsKey(param.type)) {
+          throw UnimplementedError('${param.type} is not found.');
+        }
+
+        item.params2.add(_methodMap2[param.type]);
+      }
+    }
+  }
 
   void addProvider(ProviderFileData data, AssetId source) {
     _isValid = true;
@@ -34,36 +119,37 @@ class StoreFileData {
     }
   }
 
-  Future<String> getCode(Resolver resolver, ClassElement element, AssetId aId) async {
+  void addMainFunction(FunctionElement data, AssetId source) {
+    if (_storeDataClass != null) return;
+    if (_mainFunc != null) {
+      _mainFuncMulti = true;
+    }
+
+    _mainFunc = data;
+    _mainFuncSource = source;
+  }
+
+  void addStoreData(ClassElement data, AssetId source) {
+    if (_storeDataClass != null) {
+      _storeDataClassMulti = true;
+    }
+
+    _storeDataClass = data;
+    _storeDataClassSource = source;
+  }
+
+  bool isStoreSource(AssetId source) {
+    if (_storeDataClass != null) {
+      return source.uri == _storeDataClassSource.uri;
+    } else if (_mainFunc != null) {
+      return source.uri == _mainFuncSource.uri;
+    }
+
+    return false;
+  }
+
+  Future<String> getCode(Resolver resolver, AssetId aId) async {
     _importList.add(aId.uri);
-    _implementName = element.name;
-
-    for (final method in element.methods) {
-      if (method.isPublic && !method.isAbstract 
-          && !method.isStatic && method.parameters.isEmpty
-          && TypeUtil.isOverride(method)) {
-        if (_methodMap.containsKey(method.returnType)) {
-          throw UnimplementedError('Not support multi ${method.returnType}.');
-        }
-
-        await TypeUtil.getImportList(
-            method.returnType, _importList, resolver);
-
-        _methodMap[method.returnType] = StoreMethod(
-            method.name, method.returnType, isAbstract: true);
-      }
-    }
-
-    for (final item in _variableList) {
-      for (final param in item.provider.args) {
-        if (!_methodMap.containsKey(param.type)) {
-          throw UnimplementedError('${param.type} is not found.');
-        }
-
-        item.params.add(_methodMap[param.type]);
-      }
-    }
-
     return await _getCode(resolver);
   }
 
@@ -131,6 +217,7 @@ class StoreFileData {
   Future<String> _getVariablesCode(Resolver resolver, Set<Uri> importList, Map<DartType, StringBuffer> variableSendActionMap) async {
     final initialVariables = StringBuffer();
     initialVariables.writeln('final _typeMap = HashMap<dynamic, String>();');
+    initialVariables.writeln('final $_dataName2 _data;');
 
     for (final item in _variableList) {
       initialVariables.writeln(await item.getInitial());
@@ -166,7 +253,7 @@ class StoreFileData {
 
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
-      ..writeln('abstract class ${Name.classStore} {')
+      ..writeln('class ${Name.classStore} {')
       ..writeln(variables)
       ..writeln(await _getParseTypeMethod())
       ..writeln('Stream<T> getStream<T>([String key]) {')
@@ -175,17 +262,9 @@ class StoreFileData {
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendMethod)
       ..writeln('}')
-      ..writeln('factory ${Name.classStore}() => ${_implementName}();')
-      ..writeln()
-      ..writeln('${Name.classStore}.unused() {')
+      ..writeln('${Name.classStore}([$_dataName2 data]): _data = data {')
       ..writeln(await _getConstructorCode())
-      ..writeln('}');
-    
-    for (final entry in _methodMap.entries) {
-      code.writeln(entry.value.getCode());
-    }
-    
-    code.writeln('}');
+      ..writeln('} }');
 
     return code.toString();
   }

@@ -1,14 +1,14 @@
 builders:
-  reduxReducerProviderGenerator:
+  redux2Generator:
     import: "package:plus_redux_generator/builders.dart"
-    builder_factories: ["reduxReducerProviderGenerator"]
-    build_extensions: {".dart": [".g.part"]}
-    auto_apply: dependents
-    build_to: cache
-
-  reduxStoreGenerator:
-    import: "package:plus_redux_generator/builders.dart"
-    builder_factories: ["reduxStoreGenerator"]
+    builder_factories: ["reduxGenerator"]
     build_extensions: {".dart": [".p.dart"]}
     auto_apply: dependents
     build_to: source
+
+  redux1Prepare:
+    import: "package:plus_redux_generator/builders.dart"
+    builder_factories: ["reduxPrepare"]
+    build_extensions: {".dart": [".g.part"]}
+    auto_apply: dependents
+    build_to: cache

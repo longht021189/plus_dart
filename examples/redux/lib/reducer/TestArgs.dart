@@ -1,7 +1,7 @@
 import 'package:plus_redux/redux.dart';
 
 @ReduxKey('Test')
-class TestArgs extends Reducer<TestArgsState<String>, TestArgsAction> {
+class TestArgs extends Reducer<TestArgsState<String>, TestArgsAction<int>> {
 
   @override
   TestArgsState<String> get initialState => null;
@@ -11,7 +11,7 @@ class TestArgs extends Reducer<TestArgsState<String>, TestArgsAction> {
   TestArgs(this.name);
 
   @override
-  Future<TestArgsState<String>> onUpdate(TestArgsState<String> state, TestArgsAction action) {
+  Future<TestArgsState<String>> onUpdate(TestArgsState<String> state, TestArgsAction<int> action) {
     return null;
   }
 }
@@ -20,6 +20,6 @@ class TestArgsState<T> {
   T value;
 }
 
-class TestArgsAction {
+class TestArgsAction<G> {
 
 }

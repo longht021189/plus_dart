@@ -1,7 +1,7 @@
 import 'package:build/build.dart';
-import 'package:plus_redux_generator/builders/redux/ProviderBuilder.dart';
-import 'package:plus_redux_generator/builders/redux/StoreBuilder.dart';
+import 'package:plus_redux_generator/builders/redux/ReduxPrepare.dart';
+import 'package:plus_redux_generator/builders/redux/ReduxGenerator.dart';
 
-Builder reduxReducerProviderGenerator(BuilderOptions options) => ProviderBuilder();
+Builder reduxGenerator(BuilderOptions options) => ReduxGenerator();
 
-Builder reduxStoreGenerator(BuilderOptions options) => StoreBuilder();
+Builder reduxPrepare(BuilderOptions options) => ReduxPrepare();

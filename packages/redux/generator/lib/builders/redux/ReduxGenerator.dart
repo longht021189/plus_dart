@@ -10,7 +10,7 @@ import 'package:plus_redux_generator/builders/data/redux/StoreFileData.dart';
 import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
 import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
-class StoreBuilder extends BaseBuilder {
+class ReduxGenerator extends BaseBuilder {
 
   static StoreFileData _data = StoreFileData();
 
@@ -18,30 +18,26 @@ class StoreBuilder extends BaseBuilder {
     _data.addProvider(data, source);
   }
 
+  static void addMainFunction(FunctionElement data, AssetId source) {
+    _data.addMainFunction(data, source);
+  }
+
+  static void addStoreData(ClassElement data, AssetId source) {
+    _data.addStoreData(data, source);
+  }
+
   @override
   Map<String, List<String>> buildExtensions = {
     '.dart': [FileExtensions.Store]
   };
 
-  ClassElement _getStoreClass(List<ClassElement> list) {
-    if (list == null || list.length <= 0) return null;
-    for (final item in list) {
-      if (TypeUtil.isStore(item)) {
-        return item;
-      }
-    }
-
-    return null;
-  }
-
   @override
   Future buildSource(LibraryElement library, BuildStep buildStep) async {
-    if (!_data.isValid) return;
+    if (!(await _data.isValid(buildStep.resolver))) return;
 
     final visitor = GetClasses();
     library.visitChildren(visitor);
 
-    final storeClass = _getStoreClass(visitor.value);
     final it = _data.providerFileList
       .where((element) => buildStep.inputId.uri == element.source.uri);
     
@@ -53,9 +49,9 @@ class StoreBuilder extends BaseBuilder {
       await CodeUtil.writeToFile(buildStep, output, code);
     }
 
-    if (storeClass == null) return;
+    if (!_data.isStoreSource(buildStep.inputId)) return;
 
-    final code = await _data.getCode(buildStep.resolver, storeClass, buildStep.inputId);
+    final code = await _data.getCode(buildStep.resolver, buildStep.inputId);
     final output = buildStep.inputId.changeExtension(FileExtensions.Store);
 
     await CodeUtil.writeToFile(buildStep, output, code);

@@ -3,6 +3,10 @@ Implement Redux Generator:
   * Middleware
   * Save state
 
+## 0.0.3
+Implement Redux Generator:
+  * Use Getter/Fields/Function as Input (@store)
+
 ## 0.0.2
 Implement Redux Generator:
   * Remove Lazy (All is Lazy)

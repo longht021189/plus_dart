@@ -5,20 +5,20 @@ import 'package:plus_redux_generator/builders/data/redux/StoreMethod.dart';
 class StoreVariableData {
   final ProviderData provider;
   final String name;
-  final List<StoreMethod> params = List();
+  final List<StoreMethod> params2 = List();
 
   StoreVariableData(this.provider)
       : name = Name.getStoreVariableName(provider.name);
 
   String _getParams() {
-    if (params.isEmpty) {
+    if (params2.isEmpty) {
       return '';
     }
 
     final code = StringBuffer();
 
     bool isFirst = true;
-    for (final item in params) {
+    for (final item in params2) {
       if (!isFirst) {
         code.write(', ');
       }
