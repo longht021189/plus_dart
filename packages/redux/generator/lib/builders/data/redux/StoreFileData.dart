@@ -29,6 +29,8 @@ class StoreFileData {
   bool _storeDataClassMulti = false;
   AssetId _storeDataClassSource;
 
+  bool _isRequiredStoreData = false;
+
   List<ProviderFileData> get providerFileList => _providerDataList;
 
   Future<bool> isValid(Resolver resolver) async {
@@ -104,6 +106,7 @@ class StoreFileData {
           throw UnimplementedError('${param.type} is not found.');
         }
 
+        _isRequiredStoreData = true;
         item.params2.add(_methodMap2[param.type]);
       }
     }
@@ -148,7 +151,7 @@ class StoreFileData {
     return false;
   }
 
-  Future<String> getCode(Resolver resolver, AssetId aId) async {
+  Future<String> getStoreCode(Resolver resolver, AssetId aId) async {
     _importList.add(aId.uri);
     return await _getCode(resolver);
   }
@@ -262,7 +265,10 @@ class StoreFileData {
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendMethod)
       ..writeln('}')
-      ..writeln('${Name.classStore}([$_dataName2 data]): _data = data {')
+      ..write('${Name.classStore}([$_dataName2 data])')
+      ..write(': _data = data')
+      ..write(_isRequiredStoreData ? ', assert(_data != null)' : '')
+      ..writeln('{')
       ..writeln(await _getConstructorCode())
       ..writeln('} }');
 

@@ -11,5 +11,5 @@ class AppReducerLazyProvider
     extends Provider<HomeState, AppStateAction, AppReducerLazy> {
   AppReducerLazyProvider.createWith(AppReducerLazy reducer) : super(reducer);
   AppReducerLazyProvider() : super(AppReducerLazy());
-  static const key = 'f0ef0fe1-9d94-4037-aeda-9962df16e202';
+  static const key = '5e6c8420-4220-469e-a1a5-d4fe97c9b4e1';
 }

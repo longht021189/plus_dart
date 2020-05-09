@@ -116,7 +116,9 @@ class Store {
     }
   }
 
-  Store([StoreData data]) : _data = data {
+  Store([StoreData data])
+      : _data = data,
+        assert(_data != null) {
     _parse<HomeState>(AppReducerLazyProvider.key);
     _parse<AppStateGeneric<AppState>>(AppReducerWithGenericProvider.key);
     _parse<AppState>(AppReducerProvider.key);

@@ -51,7 +51,7 @@ class ReduxGenerator extends BaseBuilder {
 
     if (!_data.isStoreSource(buildStep.inputId)) return;
 
-    final code = await _data.getCode(buildStep.resolver, buildStep.inputId);
+    final code = await _data.getStoreCode(buildStep.resolver, buildStep.inputId);
     final output = buildStep.inputId.changeExtension(FileExtensions.Store);
 
     await CodeUtil.writeToFile(buildStep, output, code);
