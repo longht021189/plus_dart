@@ -15,6 +15,9 @@ import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 class ReduxPrepare extends BaseBuilder {
 
   @override
+  String get buildName => 'redux_prepare';
+
+  @override
   Map<String, List<String>> buildExtensions = {
     '.dart': [FileExtensions.Provider]
   };

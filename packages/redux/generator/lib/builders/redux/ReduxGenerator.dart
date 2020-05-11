@@ -12,6 +12,9 @@ import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class ReduxGenerator extends BaseBuilder {
 
+  @override
+  String get buildName => 'redux_generator';
+
   static StoreFileData _data = StoreFileData();
 
   static void addProvider(ProviderFileData data, AssetId source) {

@@ -1,5 +1,7 @@
 ## TBD
 Implement Redux Generator:
+  * Convert to source_gen / SharePartBuilder
+  * Check sometimes is not rebuild
   * Middleware
   * Save state
 

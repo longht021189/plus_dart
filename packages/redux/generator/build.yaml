@@ -1,14 +1,22 @@
 builders:
-  redux2Generator:
+  redux_prepare:
+    import: "package:plus_redux_generator/builders.dart"
+    builder_factories: ["reduxPrepare"]
+    build_extensions: {".dart": [".p.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|redux_generator"]
+
+  redux_generator:
     import: "package:plus_redux_generator/builders.dart"
     builder_factories: ["reduxGenerator"]
     build_extensions: {".dart": [".p.dart"]}
     auto_apply: dependents
     build_to: source
+    required_inputs: [".p.part"]
+    applies_builders: ["source_gen|all_cleanup"]
 
-  redux1Prepare:
+post_process_builders:
+  all_cleanup:
     import: "package:plus_redux_generator/builders.dart"
-    builder_factories: ["reduxPrepare"]
-    build_extensions: {".dart": [".g.part"]}
-    auto_apply: dependents
-    build_to: cache
+    builder_factory: "allCleanup"

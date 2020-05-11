@@ -5,13 +5,22 @@ import 'package:build/build.dart';
 
 abstract class BaseBuilder extends Builder {
 
+  bool _isShowBegin = false;
+
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    final resolver = buildStep.resolver;
+    if (!_isShowBegin) {
+      _isShowBegin = true;
+      log.warning('Starting $buildName...');
+    }
+
+    /*final resolver = buildStep.resolver;
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final library = await buildStep.inputLibrary;
-    await buildSource(library, buildStep);
+    await buildSource(library, buildStep);*/
   }
 
   Future buildSource(LibraryElement library, BuildStep buildStep);
+
+  String get buildName;
 }
