@@ -217,6 +217,14 @@ class StoreFileData {
     return code.toString();
   }
 
+  Future<String> _getCloseMethodCode() async {
+    final code = StringBuffer();
+    for (final item in _variableList) {
+      code.writeln(await item.getCloseMethod());
+    }
+    return code.toString(); 
+  }
+
   Future<String> _getVariablesCode(Resolver resolver, Set<Uri> importList, Map<DartType, StringBuffer> variableSendActionMap) async {
     final initialVariables = StringBuffer();
     initialVariables.writeln('final _typeMap = HashMap<dynamic, String>();');
@@ -254,6 +262,8 @@ class StoreFileData {
 
     final streamMethod = await _getStreamMethodCode();
 
+    final closeMethod = await _getCloseMethodCode();
+
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
       ..writeln('class ${Name.classStore} {')
@@ -264,6 +274,9 @@ class StoreFileData {
       ..writeln('}')
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln(sendMethod)
+      ..writeln('}')
+      ..writeln('Future close() async {')
+      ..writeln(closeMethod)
       ..writeln('}')
       ..write('${Name.classStore}([$_dataName2 data])')
       ..write(': _data = data')

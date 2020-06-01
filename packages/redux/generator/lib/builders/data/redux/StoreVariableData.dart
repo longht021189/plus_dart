@@ -60,12 +60,16 @@ class StoreVariableData {
   Future<String> getStream() async {
     if (provider.isLazy) {
       final code = StringBuffer();
-      code.writeln("if ($name == null || $name.isClosed) { $name = ${_createInstance()};}");
+      code.writeln("if ($name == null || $name.isClosed) { $name = ${_createInstance()}; }");
       code.writeln("return $name.stream as Stream<T>;");
 
       return code.toString();
     }
 
     throw UnimplementedError();
+  }
+
+  Future<String> getCloseMethod() async {
+    return "if ($name != null) { if (!$name.isClosed) { await $name.close(); } $name = null; }";
   }
 }
