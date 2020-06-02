@@ -82,5 +82,6 @@ abstract class ReducerProvider<State, Action, T extends Reducer<State, Action>> 
     await _streamAction.close();
     await _streamState.close();
     await _subscription.cancel();
+    await _reducer.close();
   }
 }

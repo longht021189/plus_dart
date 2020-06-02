@@ -102,12 +102,20 @@ class StoreFileData {
 
     for (final item in _variableList) {
       for (final param in item.provider.args) {
-        if (!_methodMap2.containsKey(param.type)) {
+        final isIStore = await TypeUtil
+          .isIStore(resolver, param.type);
+
+        if (!_methodMap2.containsKey(param.type) && !isIStore) {
           throw UnimplementedError('${param.type} is not found.');
         }
 
-        _isRequiredStoreData = true;
-        item.params2.add(_methodMap2[param.type]);
+        if (isIStore) {
+          item.params2.add(StoreMethod(
+            null, null, isIStore: true));
+        } else {
+          _isRequiredStoreData = true;
+          item.params2.add(_methodMap2[param.type]);
+        }
       }
     }
   }
@@ -252,6 +260,7 @@ class StoreFileData {
     final variableSendActionMap = HashMap<DartType, StringBuffer>();
 
     importList.add(UriList.collection);
+    importList.add(UriList.base);
     importList.addAll(_importList);
 
     final variables = await _getVariablesCode(
@@ -266,19 +275,23 @@ class StoreFileData {
 
     final code = StringBuffer()
       ..writeln(CodeUtil.importFiles(importList))
-      ..writeln('class ${Name.classStore} {')
+      ..writeln('class ${Name.classStore} extends IStore {')
       ..writeln(variables)
       ..writeln('bool _isClosed = false;')
+      ..writeln('@override')
       ..writeln('bool get isClosed => _isClosed;')
       ..writeln(await _getParseTypeMethod())
+      ..writeln('@override')
       ..writeln('Stream<T> getStream<T>([String key]) {')
       ..writeln('if (_isClosed) throw UnimplementedError();')
       ..writeln(streamMethod)
       ..writeln('}')
+      ..writeln('@override')
       ..writeln('Future sendAction(dynamic ${Name.methodSendActionParam}) async {')
       ..writeln('if (_isClosed) return;')
       ..writeln(sendMethod)
       ..writeln('}')
+      ..writeln('@override')
       ..writeln('Future close() async {')
       ..writeln('if (_isClosed) return;')
       ..writeln('_isClosed = true;')

@@ -8,7 +8,6 @@ import 'package:plus_redux_generator/builders/config/FileExtensions.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderFileData.dart';
 import 'package:plus_redux_generator/builders/data/redux/StoreFileData.dart';
 import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
-import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class ReduxGenerator extends BaseBuilder {
 

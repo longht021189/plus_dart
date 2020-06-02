@@ -14,10 +14,10 @@ abstract class BaseBuilder extends Builder {
       log.warning('Starting $buildName...');
     }
 
-    /*final resolver = buildStep.resolver;
+    final resolver = buildStep.resolver;
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final library = await buildStep.inputLibrary;
-    await buildSource(library, buildStep);*/
+    await buildSource(library, buildStep);
   }
 
   Future buildSource(LibraryElement library, BuildStep buildStep);
