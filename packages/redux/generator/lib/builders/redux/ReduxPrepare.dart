@@ -10,6 +10,7 @@ import 'package:plus_redux_generator/builders/config/FileExtensions.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderData.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderFileData.dart';
 import 'package:plus_redux_generator/builders/redux/ReduxGenerator.dart';
+import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
 import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class ReduxPrepare extends BaseBuilder {
@@ -28,7 +29,14 @@ class ReduxPrepare extends BaseBuilder {
     final mainFunc = _getMainFunction(library);
 
     if (mainFunc != null) {
-      ReduxGenerator.addMainFunction(mainFunc, buildStep.inputId);
+      // ReduxGenerator.addMainFunction(mainFunc, buildStep.inputId);
+
+      this.print('buildSource: ${buildStep.inputId.uri}');
+
+      CodeUtil.writeToFile(buildStep, buildStep
+        .inputId.changeExtension(FileExtensions.Provider), '');
+
+      return;
     }
     if (classList.isEmpty) return;
 
@@ -36,7 +44,14 @@ class ReduxPrepare extends BaseBuilder {
     final fileData = ProviderFileData(List(), buildStep.inputId);
 
     if (storeData != null) {
-      ReduxGenerator.addStoreData(storeData, buildStep.inputId);
+      // ReduxGenerator.addStoreData(storeData, buildStep.inputId);
+
+      this.print('buildSource: ${buildStep.inputId.uri}');
+
+      CodeUtil.writeToFile(buildStep, buildStep
+        .inputId.changeExtension(FileExtensions.Provider), '');
+
+      return;
     }
 
     for (final classItem in classList) {
@@ -53,9 +68,13 @@ class ReduxPrepare extends BaseBuilder {
 
     if (fileData.classDataList.isEmpty) return;
 
-    final output = buildStep.inputId.changeExtension(FileExtensions.Store);
+    // final output = buildStep.inputId.changeExtension(FileExtensions.Store);
+    // ReduxGenerator.addProvider(fileData, output);
 
-    ReduxGenerator.addProvider(fileData, output);
+    this.print('buildSource: ${buildStep.inputId.uri}');
+
+    CodeUtil.writeToFile(buildStep, buildStep
+        .inputId.changeExtension(FileExtensions.Provider), '');
   }
 
   FunctionElement _getMainFunction(LibraryElement library) {

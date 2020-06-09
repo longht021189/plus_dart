@@ -1,3 +1,9 @@
 [submodule "packages/hive"]
 	path = packages/hive
 	url = git@github.com:longht021189/hive.git
+[submodule "packages/build"]
+	path = packages/build
+	url = git@github.com:longht021189/build.git
+[submodule "packages/source_gen"]
+	path = packages/source_gen
+	url = git@github.com:longht021189/source_gen.git

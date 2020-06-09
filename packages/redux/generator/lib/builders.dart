@@ -10,3 +10,10 @@ Builder reduxPrepare(BuilderOptions options) => ReduxPrepare();
 
 PostProcessBuilder allCleanup(BuilderOptions options) => 
     PostProcessBuilderWrapper('all_cleanup', const FileDeletingBuilder([FileExtensions.Provider]));
+
+
+Builder reduxBuilder() => Test();
+
+class Test extends MultiplexingBuilder {
+  Test() : super([ReduxPrepare(), ReduxGenerator()]);
+}

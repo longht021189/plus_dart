@@ -22,7 +22,8 @@ dev_dependencies:
     path: ../../packages/redux/generator
   
   built_value_generator: ^7.1.0
-  build_runner: ^1.8.1
+  build_runner:
+    path: ../../packages/build/build_runner
 
 flutter:
   uses-material-design: true

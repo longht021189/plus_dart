@@ -1,3 +1,4 @@
 .packages
 *.lock
 .dart_tool
+**.p.part

@@ -17,6 +17,8 @@ class PostProcessBuilderWrapper extends PostProcessBuilder {
       _isShowBegin = true;
       log.warning('Starting $buildName...');
     }
+
+    log.warning('Starting ${buildStep.inputId.uri}');
     
     return builder.build(buildStep);
   }

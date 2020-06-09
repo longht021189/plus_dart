@@ -1,30 +1,20 @@
-//import 'package:built_value/built_value.dart';
+import 'package:built_value/built_value.dart';
 import 'package:plus_redux/redux.dart';
 
-//part 'store.g.dart';
-
-/*@store
-class StoreImpl extends Store {
-  StoreImpl(): super.unused();
-
-  @override
-  String provideForTestArgs() {
-    return "Test";
-  }
-}*/
+part 'store.g.dart';
 
 @store
-abstract class StoreData { //implements Built<StoreData, StoreDataBuilder> {
+abstract class StoreData implements Built<StoreData, StoreDataBuilder> {
 
-  String appKey;
-
-  double abc;
+  String get appKey;
+  double get abc;
+  int get fff;
 
   int getInt() {
     return 0;
   }
 
-  //StoreData._();
+  StoreData._();
 
-  //factory StoreData([void Function(StoreDataBuilder) updates]) = _$StoreData;
+  factory StoreData([void Function(StoreDataBuilder) updates]) = _$StoreData;
 }

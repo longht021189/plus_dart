@@ -5,19 +5,16 @@ import 'package:build/build.dart';
 
 abstract class BaseBuilder extends Builder {
 
-  bool _isShowBegin = false;
-
   @override
   FutureOr<void> build(BuildStep buildStep) async {
-    if (!_isShowBegin) {
-      _isShowBegin = true;
-      log.warning('Starting $buildName...');
-    }
-
     final resolver = buildStep.resolver;
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final library = await buildStep.inputLibrary;
     await buildSource(library, buildStep);
+  }
+
+  void print(msg) {
+    log.info('[$buildName] $msg');
   }
 
   Future buildSource(LibraryElement library, BuildStep buildStep);
