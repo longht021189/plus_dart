@@ -35,7 +35,6 @@ class ReduxGenerator extends BaseBuilder {
 
   @override
   Future buildSource(LibraryElement library, BuildStep buildStep) async {
-    this.print('buildSource: ${buildStep.inputId.uri}');
     if (!(await _data.isValid(buildStep.resolver))) return;
 
     final visitor = GetClasses();

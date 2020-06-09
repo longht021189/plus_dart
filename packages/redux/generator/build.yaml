@@ -5,7 +5,8 @@ builders:
     build_extensions: {".dart": [".p.part"]}
     auto_apply: dependents
     build_to: cache
-    applies_builders: ["redux_generator"]
+    runs_before: [":redux_generator"]
+    applies_builders: [":redux_generator"]
 
   redux_generator:
     import: "package:plus_redux_generator/builders.dart"

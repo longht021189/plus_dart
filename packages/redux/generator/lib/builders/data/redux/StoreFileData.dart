@@ -299,7 +299,7 @@ class StoreFileData {
       ..writeln('}')
       ..write('${Name.classStore}([$_dataName2 data])')
       ..write(': _data = data')
-      ..write(_isRequiredStoreData ? ', assert(_data != null)' : '')
+      ..write(_isRequiredStoreData ? ', assert(data != null)' : '')
       ..writeln('{')
       ..writeln(await _getConstructorCode())
       ..writeln('} }');
