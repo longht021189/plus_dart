@@ -29,13 +29,7 @@ class ReduxPrepare extends BaseBuilder {
     final mainFunc = _getMainFunction(library);
 
     if (mainFunc != null) {
-      // ReduxGenerator.addMainFunction(mainFunc, buildStep.inputId);
-
-      this.print('buildSource: ${buildStep.inputId.uri}');
-
-      CodeUtil.writeToFile(buildStep, buildStep
-        .inputId.changeExtension(FileExtensions.Provider), '');
-
+      ReduxGenerator.addMainFunction(mainFunc, buildStep.inputId);
       return;
     }
     if (classList.isEmpty) return;
@@ -44,13 +38,7 @@ class ReduxPrepare extends BaseBuilder {
     final fileData = ProviderFileData(List(), buildStep.inputId);
 
     if (storeData != null) {
-      // ReduxGenerator.addStoreData(storeData, buildStep.inputId);
-
-      this.print('buildSource: ${buildStep.inputId.uri}');
-
-      CodeUtil.writeToFile(buildStep, buildStep
-        .inputId.changeExtension(FileExtensions.Provider), '');
-
+      ReduxGenerator.addStoreData(storeData, buildStep.inputId);
       return;
     }
 
@@ -68,13 +56,8 @@ class ReduxPrepare extends BaseBuilder {
 
     if (fileData.classDataList.isEmpty) return;
 
-    // final output = buildStep.inputId.changeExtension(FileExtensions.Store);
-    // ReduxGenerator.addProvider(fileData, output);
-
-    this.print('buildSource: ${buildStep.inputId.uri}');
-
-    CodeUtil.writeToFile(buildStep, buildStep
-        .inputId.changeExtension(FileExtensions.Provider), '');
+    final output = buildStep.inputId.changeExtension(FileExtensions.Store);
+    ReduxGenerator.addProvider(fileData, output);
   }
 
   FunctionElement _getMainFunction(LibraryElement library) {

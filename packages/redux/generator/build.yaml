@@ -1,25 +1,21 @@
 builders:
-  
-
-  # redux_prepare:
-  #   import: "package:plus_redux_generator/builders.dart"
-  #   builder_factories: ["reduxPrepare"]
-  #   build_extensions: {".dart": [".p.part"]}
-  #   auto_apply: dependents
-  #   build_to: cache
-  #   applies_builders: ["plus_redux_generator|all_cleanup"]
-
-  # redux_generator:
-  #   import: "package:plus_redux_generator/builders.dart"
-  #   builder_factories: ["reduxGenerator"]
-  #   build_extensions: {".dart": [".p.dart"]}
-  #   auto_apply: dependents
-  #   build_to: source
-  #   required_inputs: [".p.part"]
-  #   applies_builders: ["all_cleanup"]
-
-post_process_builders:
-  all_cleanup:
+  redux_prepare:
     import: "package:plus_redux_generator/builders.dart"
-    input_extensions: [".p.part"]
-    builder_factory: "allCleanup"
+    builder_factories: ["reduxPrepare"]
+    build_extensions: {".dart": [".p.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["redux_generator"]
+
+  redux_generator:
+    import: "package:plus_redux_generator/builders.dart"
+    builder_factories: ["reduxGenerator"]
+    build_extensions: {".dart": [".p.dart"]}
+    auto_apply: dependents
+    build_to: source
+
+# post_process_builders:
+#   all_cleanup:
+#     import: "package:plus_redux_generator/builders.dart"
+#     input_extensions: [".p.part"]
+#     builder_factory: "allCleanup"

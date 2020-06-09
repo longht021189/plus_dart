@@ -16,7 +16,7 @@ class ReduxGenerator extends BaseBuilder {
 
   static StoreFileData _data = StoreFileData();
 
-  /*static void addProvider(ProviderFileData data, AssetId source) {
+  static void addProvider(ProviderFileData data, AssetId source) {
     _data.addProvider(data, source);
   }
 
@@ -26,7 +26,7 @@ class ReduxGenerator extends BaseBuilder {
 
   static void addStoreData(ClassElement data, AssetId source) {
     _data.addStoreData(data, source);
-  }*/
+  }
 
   @override
   Map<String, List<String>> buildExtensions = {
