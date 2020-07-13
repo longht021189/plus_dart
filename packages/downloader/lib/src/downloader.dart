@@ -1,17 +1,23 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:equatable/equatable.dart';
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
 import 'package:plus_downloader/src/client/base_client.dart';
 import 'package:plus_downloader/src/code/status_code.dart';
 import 'package:plus_downloader/src/error/error.dart';
+import 'package:plus_downloader/src/internal/part.dart';
+import 'package:plus_downloader/src/internal/part_manager.dart';
 import 'package:plus_downloader/src/request/download_request.dart';
+import 'package:plus_downloader/src/response/response_stream.dart';
+import 'package:plus_downloader/src/util/headers_util.dart';
+import 'package:plus_downloader/src/util/unit_util.dart';
 
 typedef void _ProcessCallback(int bytesCount);
 typedef void _VoidCallback();
 typedef void _ErrorCallback(dynamic error);
+
+const _delayedWhenRetry = 5; // seconds
 
 class Downloader {
   final BaseClient client;
@@ -28,6 +34,8 @@ class Downloader {
     , assert(fileSystem != null)
     , assert(minSizePerPart != null && minSizePerPart > 0)
     , assert(maxPartCount != null && maxPartCount > 0);
+
+  // region remove
 
   Future<void> download(String url, String path) {
     final completer = Completer();
@@ -177,145 +185,131 @@ class Downloader {
       completer.completeError(error);
     }
   }
-}
 
-class PartManager {
-  final String path;
-  final int contentLength;
-  final int minPartSize;
-  final partList = List<Part>();
-  final FileSystem fileSystem;
+  // endregion
 
-  PartManager({
-    @required this.path,
-    @required this.contentLength,
-    @required this.minPartSize,
-    @required this.fileSystem,
-  }): assert(path != null)
-    , assert(fileSystem != null)
-    , assert(contentLength != null && contentLength > 0)
-    , assert(minPartSize != null && minPartSize > 0);
+  Future<void> download2(String url, String path) {
+    final completer = Completer();
+    _download2(url, path, completer);
+    return completer.future;
+  }
 
-  Part createPart() {
-    final createdCount = partList.length + 1;
-    final startBytes = findBestBytesToStart();
+  void _reportError(dynamic error) {
 
-    if (startBytes >= 0) {
-      final part = Part(
-        path: '${path}.part$createdCount',
-        startBytes: startBytes,
-        fileSystem: fileSystem
+  }
+
+  Future<PartManager> _createPartManager(String url, String path) async {
+    final request = DownloadRequest(url: url);
+    final head = await client.head(request);
+
+    if (head.statusCode != StatusCode.OK) {
+      throw RequestError(head.statusCode, url);
+    }
+
+    final headers = HeadersUtil.getHeaders(head);
+    final contentLength = HeadersUtil.getContentLength(headers);
+
+    if (HeadersUtil.isRangeEnabled(headers, minSizePerPart)) {
+      final minSize = UnitUtil.megaBytesToBytes(minSizePerPart);
+      final size = min(minSize, contentLength ~/ maxPartCount);
+
+      return PartManager(
+        fileSystem: fileSystem,
+        minPartSize: size ~/ 2,
+        contentLength: contentLength,
+        path: path,
+        rangeEnabled: true,
+        maxPartCount: maxPartCount,
+        url: url,
       );
-
-      partList.add(part);
-      partList.sort((a, b) => a.startBytes - b.startBytes);
-
-      for (int i = 0; i < partList.length - 1; ++i) {
-        partList[i].updateContentMax(
-            partList[i + 1].startBytes - partList[i].startBytes);
-      }
-
-      return part;
     } else {
-      return null;
+      return PartManager(
+        fileSystem: fileSystem,
+        minPartSize: contentLength,
+        contentLength: contentLength,
+        path: path,
+        rangeEnabled: false,
+        maxPartCount: maxPartCount,
+        url: url,
+      );
     }
   }
 
-  int findBestBytesToStart() {
-    if (partList.length == 0) {
-      return 0;
-    } else {
-      int maxContent = -1;
-      int startBytes = -1;
+  Future<void> _downloadPart2(Part part) async {
+    bool isEnd = false;
 
-      for (int i = 0; i < partList.length; ++i) {
-        final start = partList[i].startBytes + partList[i].contentBytes;
-        final end = (i + 1 == partList.length) ? contentLength : partList[i + 1].startBytes;
-        final content = (end - start) ~/ 2;
+    do {
+      ResponseStream response;
 
-        if (maxContent < content && content >= minPartSize) {
-          maxContent = content;
-          startBytes = start + content;
+      try {
+        final headers = { 'Range': part.getRange() };
+        final request = DownloadRequest(url: part.url, headers: headers);
+
+        response = await client.get(request);
+
+        if (response.statusCode == part.okCode) {
+          final completer = Completer<void>();
+          final sub = response.stream
+              .listen(
+                  (bytes) {
+                    if (!completer.isCompleted
+                        && !part.writeContent(bytes)) {
+                      completer.complete();
+                    }
+                  },
+                  onError: (error) {
+                    if (!completer.isCompleted) {
+                      completer.completeError(error);
+                    }
+                  },
+                  onDone: () {
+                    if (!completer.isCompleted) {
+                      completer.complete();
+                    }
+
+                    part.onDone();
+                  }
+              );
+
+          try {
+            await completer.future;
+            isEnd = true;
+          } catch(error) {
+            _reportError(error);
+          }
+
+          await sub?.cancel();
         }
+      } catch (error) {
+        _reportError(error);
       }
 
-      if (maxContent > 0) {
-        return startBytes;
-      } else {
-        return -1;
+      response?.close();
+
+      if (!isEnd) {
+        await Future.delayed(
+            Duration(seconds: _delayedWhenRetry)
+        );
       }
-    }
-  }
-}
-
-// ignore: must_be_immutable
-class Part extends Equatable {
-  final String path;
-  final int startBytes;
-  final FileSystem fileSystem;
-
-  File _file;
-
-  int _contentMax = -1;
-  int get contentMax => _contentMax;
-
-  int _contentBytes = 0;
-  int get contentBytes => _contentBytes;
-
-  Part({
-    @required this.path,
-    @required this.startBytes,
-    @required this.fileSystem,
-  }): assert(path != null)
-    , assert(startBytes != null && startBytes >= 0)
-    , super();
-
-  String getRange() {
-    if (_contentMax == null || _contentMax < 0) {
-      return "bytes=${startBytes}-";
-    } else {
-      return "bytes=${startBytes}-${startBytes + _contentMax - 1}";
-    }
+    } while (!isEnd);
   }
 
-  void updateContentMax(int value) {
-    _contentMax = value;
+  Future<void> _download2(String url, String path, Completer completer) async {
+    PartManager manager;
+    Part part;
+
+    try {
+      manager = await _createPartManager(url, path);
+
+      do {
+        part = manager.createPart();
+        _downloadPart2(part);
+      } while(part == null);
+
+      await manager.done;
+    } catch (error) {
+      completer.completeError(error);
+      manager?.close();
+    }
   }
-
-  bool writeContent(List<int> value) {
-    if (_file == null) {
-      _file = fileSystem.file(path);
-    }
-
-    final total = _contentBytes + value.length;
-
-    List<int> list;
-    bool result = true;
-
-    if (_contentMax != null && _contentMax < total) {
-      final end = value.length - (total - _contentMax);
-
-      _contentBytes = _contentMax;
-
-      list = value.sublist(0, end);
-      result = false;
-    } else {
-      _contentBytes = total;
-
-      list = value;
-      result = true;
-    }
-    if (list != null && list.isNotEmpty) {
-      _file.writeAsBytesSync(
-          list, mode: FileMode.append);
-    }
-
-    return result;
-  }
-
-  @override
-  List<Object> get props => [path, startBytes, _contentBytes, _contentMax];
-
-  @override
-  bool get stringify => true;
 }

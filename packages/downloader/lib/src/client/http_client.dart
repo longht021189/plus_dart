@@ -3,7 +3,7 @@ import 'package:plus_downloader/src/client/base_client.dart';
 import 'package:plus_downloader/src/request/download_request.dart';
 import 'package:plus_downloader/src/response/response_stream.dart';
 
-class HttpClient extends BaseClient {
+/*class HttpClient extends BaseClient {
   final http.Client _client;
 
   HttpClient({
@@ -12,7 +12,7 @@ class HttpClient extends BaseClient {
 
   @override
   Future<ResponseStream> get(DownloadRequest request) async {
-    final req = http.Request('GET', Uri.parse(request.url));
+    final req = http.StreamedRequest('GET', Uri.parse(request.url));
     
     if (request.headers != null && request.headers.length > 0) {
       req.headers.addAll(request.headers);
@@ -20,11 +20,14 @@ class HttpClient extends BaseClient {
 
     final response = await _client.send(req);
 
+    req.sink.close();
+
     return ResponseStream(
       stream: response.stream,
       statusCode: response.statusCode,
       contentLength: response.contentLength,
-      headers: response.headers
+      headers: response.headers,
+      close: () => req.sink.close(),
     );
   }
 
@@ -43,4 +46,4 @@ class HttpClient extends BaseClient {
   Future<String> getString(String url) async {
     return (await _client.get(url)).body;
   }
-}
+}*/

@@ -1,22 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-class ResponseStream extends Equatable {
+typedef void VoidCallback();
 
-  final Map<String, String> headers;
-  final Stream<List<int>> stream;
-  final int statusCode;
-  final int contentLength;
+abstract class ResponseStream {
+  void close();
 
-  ResponseStream({
-    this.headers,
-    this.stream,
-    this.statusCode,
-    this.contentLength,
-  }): super();
-
-  @override
-  List<Object> get props => [statusCode, contentLength, headers, stream];
-  
-  @override
-  bool get stringify => true;
+  Future<void> get ready;
+  Map<String, String> get headers;
+  Stream<List<int>> get stream;
+  int get statusCode;
+  int get contentLength;
 }

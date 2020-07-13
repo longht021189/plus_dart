@@ -134,3 +134,80 @@ class YoutubeDownloader {
     explode.close();
   }
 }
+
+// TODO Test
+/*final dio = Dio();
+
+
+
+
+    print(resp.data);*/
+
+// Step 2
+// final dio = Dio();
+/*final url = 'https://mate03.y2mate.com/en2/convert';
+    final data = FormData.fromMap({
+      'type': 'youtube',
+      '_id': '5ec9e5077527f8950c8b457a',
+      'v_id': 'SRsSUH2ogsc',
+      'ajax': '1',
+      'ftype': 'mp4',
+      'fquality': '1080',
+    });
+    final resp = await dio.post(url, data: data);
+
+    print(resp.data);*/
+
+// Step 3
+/*final dio = Dio();
+    final url = 'https://mate03.y2mate.com/checkdone2.php';
+    final data = FormData.fromMap({
+      'type': 'youtube',
+      'id': '5eeae12fd684ebf3628b456a',
+      'v_id': 'SRsSUH2ogsc',
+      'ajax': '1',
+    });
+    final resp = await dio.post(url, data: data);
+
+    print(resp.data);*/
+
+/*final videoId = 'gOlYZuz5H5U';
+    final num = 10;
+
+    final urlAnalyze = 'https://mate${num}.y2mate.com/en2/analyze/ajax';
+    final formDataAnalyze = FormData.fromMap({
+      'url': 'https://www.youtube.com/watch?v=${videoId}',
+      'q_auto': '0',
+      'ajax': '1',
+    });
+    final respAnalyze = await dio.post<String>(urlAnalyze, data: formDataAnalyze);
+    final jsonAnalyze = jsonDecode(respAnalyze.data);
+    final docAnalyze = parse(jsonAnalyze['result'], encoding: 'utf-8');
+
+    final scriptsAnalyze = docAnalyze
+        .getElementsByTagName("script")
+        .map((e) => e.innerHtml.trim());
+
+    final regExp = RegExp(r'[^\w_]');
+
+    for (final script in scriptsAnalyze) {
+      final parts = script.split(',').map((e) => e.trim());
+      for (final part in parts) {
+        final items = part.split(regExp)
+            .map((e) => e.trim())
+            .where((element) => element.length > 0);
+
+        if (items.length >= 2 && items.first == '_id') {
+          print(items.join(' - '));
+        }
+      }
+    }*/
+
+
+/*print(docAnalyze
+        .getElementsByTagName("script")
+        .map((e) => e.innerHtml)
+        .where((element) => element.contains('y2mate.com/en2/convert'))
+        .join("\n\n\n"));*/
+
+// return;

@@ -12,6 +12,8 @@ dependencies:
   file: ^5.1.0
   youtube_explode_dart: ^1.0.0
   path: ^1.7.0
+  dio: ^3.0.9
 
 dev_dependencies:
   test: ^1.6.0
+  mockito: ^4.1.1
