@@ -46,7 +46,7 @@ class TypeUtil {
 
   static bool isStore(ClassElement value) {
     for (final data in value.metadata) {
-      if (data.element.name == Name.annotationStore
+      if ('$data' == '@store store()'
           && data.element.librarySource.uri == UriList.annotations) {
         return true;
       }
