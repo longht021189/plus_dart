@@ -5,7 +5,8 @@ builders:
     build_extensions: {".dart": [".p.part"]}
     auto_apply: dependents
     build_to: cache
-    applies_builders: ["source_gen|redux_generator"]
+    runs_before: [":redux_generator"]
+    applies_builders: [":redux_generator"]
 
   redux_generator:
     import: "package:plus_redux_generator/builders.dart"
@@ -13,10 +14,9 @@ builders:
     build_extensions: {".dart": [".p.dart"]}
     auto_apply: dependents
     build_to: source
-    required_inputs: [".p.part"]
-    applies_builders: ["source_gen|all_cleanup"]
 
-post_process_builders:
-  all_cleanup:
-    import: "package:plus_redux_generator/builders.dart"
-    builder_factory: "allCleanup"
+# post_process_builders:
+#   all_cleanup:
+#     import: "package:plus_redux_generator/builders.dart"
+#     input_extensions: [".p.part"]
+#     builder_factory: "allCleanup"

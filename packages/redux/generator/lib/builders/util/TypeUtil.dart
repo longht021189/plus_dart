@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
@@ -44,8 +46,20 @@ class TypeUtil {
 
   static bool isStore(ClassElement value) {
     for (final data in value.metadata) {
-      if (data.element.name == Name.annotationStore
+      if ('$data' == '@store store()'
           && data.element.librarySource.uri == UriList.annotations) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<bool> isIStore(Resolver resolver, DartType type) async {
+    final imports = HashSet<Uri>();
+    await getImportList(type, imports, resolver);
+
+    for (final item in imports) {
+      if (item == UriList.store) {
         return true;
       }
     }

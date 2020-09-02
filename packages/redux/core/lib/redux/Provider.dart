@@ -3,7 +3,7 @@ import 'dart:collection';
 
 import 'package:plus_redux/redux.dart';
 
-abstract class Provider<State, Action, T extends Reducer<State, Action>> {
+abstract class ReducerProvider<State, Action, T extends Reducer<State, Action>> {
   final T _reducer;
   final StreamController<Action> _streamAction;
   final StreamController<State> _streamState;
@@ -19,7 +19,7 @@ abstract class Provider<State, Action, T extends Reducer<State, Action>> {
   Stream<State> get stream => _stream;
   bool get isClosed => _isClosed;
 
-  Provider(T reducer, { bool isLocal = false })
+  ReducerProvider(T reducer, { bool isLocal = false })
       : _streamAction = StreamController()
       , _streamState = StreamController()
       , _reducer = reducer
@@ -82,5 +82,6 @@ abstract class Provider<State, Action, T extends Reducer<State, Action>> {
     await _streamAction.close();
     await _streamState.close();
     await _subscription.cancel();
+    await _reducer.close();
   }
 }

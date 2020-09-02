@@ -78,7 +78,7 @@ class ProviderData {
     final local = isLocal ? ', isLocal: true' : '';
 
     final code = StringBuffer()
-      ..writeln('class $name extends Provider<$stateType, $actionType, $className> {')
+      ..writeln('class $name extends ReducerProvider<$stateType, $actionType, $className> {')
       ..writeln('$name.createWith($className reducer): super(reducer $local);')
       ..writeln('$name(${_getArgs1()}): super($className(${_getArgs2()}) $local);')
       ..writeln('static const key = \'$key\';')

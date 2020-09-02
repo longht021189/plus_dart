@@ -10,6 +10,7 @@ import 'package:plus_redux_generator/builders/config/FileExtensions.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderData.dart';
 import 'package:plus_redux_generator/builders/data/redux/ProviderFileData.dart';
 import 'package:plus_redux_generator/builders/redux/ReduxGenerator.dart';
+import 'package:plus_redux_generator/builders/util/CodeUtil.dart';
 import 'package:plus_redux_generator/builders/util/TypeUtil.dart';
 
 class ReduxPrepare extends BaseBuilder {
@@ -29,6 +30,7 @@ class ReduxPrepare extends BaseBuilder {
 
     if (mainFunc != null) {
       ReduxGenerator.addMainFunction(mainFunc, buildStep.inputId);
+      return;
     }
     if (classList.isEmpty) return;
 
@@ -37,6 +39,7 @@ class ReduxPrepare extends BaseBuilder {
 
     if (storeData != null) {
       ReduxGenerator.addStoreData(storeData, buildStep.inputId);
+      return;
     }
 
     for (final classItem in classList) {
@@ -54,7 +57,6 @@ class ReduxPrepare extends BaseBuilder {
     if (fileData.classDataList.isEmpty) return;
 
     final output = buildStep.inputId.changeExtension(FileExtensions.Store);
-
     ReduxGenerator.addProvider(fileData, output);
   }
 
